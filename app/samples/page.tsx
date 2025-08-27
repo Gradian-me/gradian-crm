@@ -236,7 +236,7 @@ export default function SamplesPage() {
         </Button>
       }
     >
-      <main className="flex-1 p-6">
+      <div className="p-6">
         <NoSSR>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
@@ -492,8 +492,8 @@ export default function SamplesPage() {
               </div>
             </TabsContent>
           </Tabs>
-        </NoSSR>
-      </main>
+                    </NoSSR>
+          </div>
     </MainLayout>
   )
 } 

@@ -31,7 +31,7 @@ import { MainLayout } from "@/components/layout/MainLayout"
 import { NoSSR } from "@/components/ui/no-ssr"
 import dynamic from "next/dynamic"
 import { applyChartTheme, chartTheme } from "@/lib/chart-theme"
-import { KPIGrid } from "@/components/analytics"
+import { KPIGrid, SuccessMetricsCard, InfoMetricsCard, WarningMetricsCard, CompactMetricsCard } from "@/components/analytics"
 
 // Dynamically import ECharts to avoid SSR issues
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false })
@@ -84,7 +84,7 @@ const complianceData = [
     status: "overdue",
     priority: "low",
     dueDate: "2024-11-30",
-    assignedTo: "John Smith",
+    assignedTo: "Mahyar Abidi",
     department: "Clinical",
     lastUpdated: "2024-12-07",
     riskLevel: "medium",
@@ -257,7 +257,7 @@ export default function CompliancePage() {
         </Button>
       }
     >
-      <main className="flex-1 p-6">
+      <div className="p-6">
         <NoSSR>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">
@@ -508,46 +508,41 @@ export default function CompliancePage() {
                     <CardDescription>Key performance indicators</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <TrendingUp className="h-4 w-4 text-green-600" />
-                          <span className="text-sm font-medium">Regulatory Score</span>
-                        </div>
-                        <span className="text-lg font-bold text-green-600">98%</span>
-                      </div>
-
-                      <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <Shield className="h-4 w-4 text-blue-600" />
-                          <span className="text-sm font-medium">Quality Score</span>
-                        </div>
-                        <span className="text-lg font-bold text-blue-600">95%</span>
-                      </div>
-
-                      <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                          <span className="text-sm font-medium">Risk Score</span>
-                        </div>
-                        <span className="text-lg font-bold text-yellow-600">Medium</span>
-                      </div>
-
-                      <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-purple-600" />
-                          <span className="text-sm font-medium">On-Time Rate</span>
-                        </div>
-                        <span className="text-lg font-bold text-purple-600">92%</span>
-                      </div>
+                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                      <SuccessMetricsCard
+                        title="Regulatory Score"
+                        value="98%"
+                        icon={TrendingUp}
+                        size="sm"
+                      />
+                      
+                      <InfoMetricsCard
+                        title="Quality Score"
+                        value="95%"
+                        icon={Shield}
+                        size="sm"
+                      />
+                      
+                      <WarningMetricsCard
+                        title="Risk Score"
+                        value="Medium"
+                        icon={AlertTriangle}
+                        size="sm"
+                      />
+                      
+                      <CompactMetricsCard
+                        title="On-Time Rate"
+                        value="92%"
+                        icon={Calendar}
+                      />
                     </div>
                   </CardContent>
                 </Card>
               </div>
             </TabsContent>
           </Tabs>
-        </NoSSR>
-      </main>
+                    </NoSSR>
+          </div>
     </MainLayout>
   )
 } 

@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-08-27 15:45:26] - Feature Minor: Implement Sticky Header with Scroll Effects
+Date and Time of changes: 2025-08-27 15:45:26
+Detailed description of changes: Implemented sticky header functionality across all pages with enhanced scroll effects and responsive design. The header now stays fixed at the top of the page when scrolling, providing better navigation experience. Added backdrop blur effects, dynamic shadow transitions, and proper z-index management. Updated MainLayout component to handle sticky positioning and content scrolling properly. Modified all page layouts to work seamlessly with the sticky header implementation.
+Components affected: 
+- components/layout/MainHeader.tsx (added sticky positioning, scroll effects, backdrop blur)
+- components/layout/MainLayout.tsx (updated layout structure for sticky header)
+- app/page.tsx (updated layout structure)
+- app/compliance/page.tsx (updated layout structure)
+- app/samples/page.tsx (updated layout structure)
+- app/analytics/page.tsx (updated layout structure)
+- app/contracts/page.tsx (updated layout structure)
+- app/sales/page.tsx (updated layout structure)
+- app/hcp/page.tsx (updated layout structure)
+- app/field/page.tsx (updated layout structure)
+----
+
+## [2025-08-27 15:41:20] - Refactor: Replace Custom Score Cards with MetricsCard Components
+Date and Time of changes: 2025-08-27 15:41:20
+Detailed description of changes: Replaced custom score card implementations in the compliance page with proper MetricsCard components from the analytics module. Updated the score cards for Regulatory Score, Quality Score, Risk Score, and On-Time Rate to use the standardized MetricsCard component with appropriate variants (success, info, warning) and sizes. This improves code consistency, maintainability, and ensures proper responsive behavior across all score card displays.
+Components affected: 
+- app/compliance/page.tsx (replaced custom score cards with MetricsCard components)
+- components/analytics/MetricsCard.tsx (utilized existing component)
+----
+
 ## [2025-01-10 17:00:00] - Feature Minor: Refactor Metrics Display with Reusable Analytics Components
 Date and Time of changes: 2025-01-10 17:00:00
 Detailed description of changes: Refactored all metrics and KPI displays across the application to use centralized, reusable analytics components. Created a comprehensive MetricsCard component with multiple variants (success, warning, info, danger), size options (small, medium, large), and trend indicators. Implemented MetricsGrid component with flexible column layouts (2-6 columns) and built-in Framer Motion animations. Replaced hardcoded metric cards in main dashboard, analytics page, samples page, compliance page, and field tracking page with the new component system. Added specialized grid layouts (KPIGrid, CompactGrid, WideGrid, TwoColumnGrid) for different use cases. Enhanced maintainability and consistency across all metric displays while providing better visual hierarchy and responsive design.

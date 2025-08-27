@@ -213,7 +213,7 @@ export default function HCPManagement() {
       headerTitle="HCP Management"
       headerSubtitle="Manage your healthcare professional relationships"
     >
-      <div className="flex-1 p-6">
+      <div className="p-6">
         <div className="space-y-6">
           {/* Add HCP Button */}
           <div className="flex justify-end">

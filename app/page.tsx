@@ -292,7 +292,7 @@ export default function Dashboard() {
       headerTitle="Dashboard"
       headerSubtitle="Welcome back, John"
     >
-      <main className="flex-1 p-6">
+      <div className="p-6">
         <NoSSR>
           <Tabs key={activeTab} value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                 <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
@@ -539,7 +539,7 @@ export default function Dashboard() {
                 </TabsContent>
               </Tabs>
             </NoSSR>
-          </main>
+          </div>
     </MainLayout>
   )
 }

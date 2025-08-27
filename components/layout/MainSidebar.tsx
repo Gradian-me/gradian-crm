@@ -68,8 +68,8 @@ export function MainSidebar() {
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-full bg-accent" />
           <div className="flex-1 text-sm">
-            <p className="font-medium">John Smith</p>
-            <p className="text-xs text-muted-foreground">Sales Rep</p>
+            <p className="font-medium">Mahyar Abidi</p>
+            <p className="text-xs text-muted-foreground">Sales Deputy</p>
           </div>
         </div>
       </SidebarFooter>

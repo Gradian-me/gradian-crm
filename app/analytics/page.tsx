@@ -211,7 +211,31 @@ const getSalesFunnelOption = () => applyChartTheme({
   },
   tooltip: {
     trigger: "item",
-    formatter: "{a} <br/>{b}: {c}",
+    formatter: function(params: any) {
+      const stage = params.name;
+      const value = params.value;
+      let conversionRate = "";
+      
+      if (stage === "Leads") {
+        conversionRate = "100% (Base)";
+      } else if (stage === "Qualified") {
+        conversionRate = "80%";
+      } else if (stage === "Proposals") {
+        conversionRate = "60%";
+      } else if (stage === "Negotiations") {
+        conversionRate = "40%";
+      } else if (stage === "Closed") {
+        conversionRate = "20%";
+      }
+      
+      return `${stage}<br/>Count: ${value}<br/>Conversion: ${conversionRate}`;
+    },
+  },
+  legend: {
+    orient: "vertical",
+    right: "5%",
+    top: "middle",
+    data: ["Leads", "Qualified", "Proposals", "Negotiations", "Closed"],
   },
   series: [
     {
@@ -225,10 +249,19 @@ const getSalesFunnelOption = () => applyChartTheme({
       minSize: "0%",
       maxSize: "100%",
       sort: "descending",
-      gap: 2,
+      gap: 3,
+      animation: true,
+      animationDuration: 1000,
+      animationEasing: "cubicOut",
       label: {
         show: true,
         position: "inside",
+        fontSize: 14,
+        fontWeight: "bold",
+        color: "#ffffff",
+        formatter: function(params: any) {
+          return `${params.name}\n${params.value}`;
+        },
       },
       labelLine: {
         length: 10,
@@ -239,19 +272,27 @@ const getSalesFunnelOption = () => applyChartTheme({
       },
       itemStyle: {
         borderColor: "#fff",
-        borderWidth: 1,
+        borderWidth: 2,
+        borderRadius: 4,
       },
       emphasis: {
         label: {
           fontSize: 20,
+          fontWeight: "bold",
+        },
+        itemStyle: {
+          shadowBlur: 10,
+          shadowColor: "rgba(0, 0, 0, 0.3)",
+          shadowOffsetX: 0,
+          shadowOffsetY: 5,
         },
       },
       data: [
-        { value: 100, name: "Leads" },
-        { value: 80, name: "Qualified" },
-        { value: 60, name: "Proposals" },
-        { value: 40, name: "Negotiations" },
-        { value: 20, name: "Closed" },
+        { value: 100, name: "Leads", itemStyle: { color: "#2563eb" } },
+        { value: 80, name: "Qualified", itemStyle: { color: "#7c3aed" } },
+        { value: 60, name: "Proposals", itemStyle: { color: "#0891b2" } },
+        { value: 40, name: "Negotiations", itemStyle: { color: "#d97706" } },
+        { value: 20, name: "Closed", itemStyle: { color: "#059669" } },
       ],
     },
   ],
@@ -349,7 +390,7 @@ export default function AnalyticsPage() {
         </div>
       }
     >
-      <main className="flex-1 p-6">
+      <div className="p-6">
         <NoSSR>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">
@@ -727,8 +768,8 @@ export default function AnalyticsPage() {
               </Card>
             </TabsContent>
           </Tabs>
-        </NoSSR>
-      </main>
+                    </NoSSR>
+          </div>
     </MainLayout>
   )
 } 

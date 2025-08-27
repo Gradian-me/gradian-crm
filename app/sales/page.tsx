@@ -186,7 +186,7 @@ export default function SalesFunnel() {
       headerTitle="Sales Funnel & Tenders"
       headerSubtitle="Manage your sales pipeline and tender opportunities"
     >
-      <div className="flex-1 p-6">
+      <div className="p-6">
         <div className="space-y-6">
           {/* New Opportunity Button */}
           <div className="flex justify-end">

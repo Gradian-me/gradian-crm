@@ -240,7 +240,7 @@ export default function ContractManagement() {
       headerTitle="Contract Management"
       headerSubtitle="Manage contracts, compliance, and regulatory documentation"
     >
-      <div className="flex-1 p-6">
+      <div className="p-6">
         <div className="space-y-6">
           {/* New Contract Button */}
           <div className="flex justify-end">
@@ -771,8 +771,8 @@ export default function ContractManagement() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="templates" className="space-y-6">
-              <div className="grid gap-6 lg:grid-cols-2">
+            <TabsContent value="templates" className="space-y-4 sm:space-y-6">
+              <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -782,7 +782,7 @@ export default function ContractManagement() {
                     <CardDescription>Pre-approved contract templates</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3">
+                    <div className="space-y-3 min-w-0">
                       {[
                         { name: "Supply Agreement Template", type: "supply", version: "v2.1" },
                         { name: "Maintenance Contract Template", type: "maintenance", version: "v1.8" },
@@ -792,16 +792,16 @@ export default function ContractManagement() {
                       ].map((template, index) => (
                         <div
                           key={index}
-                          className="flex items-center justify-between p-3 border border-border rounded-lg"
+                          className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border border-border rounded-lg gap-3 min-w-0 overflow-hidden"
                         >
                           <div className="flex items-center gap-3">
-                            <FileText className="h-4 w-4 text-muted-foreground" />
-                            <div>
-                              <p className="font-medium text-sm">{template.name}</p>
+                            <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                            <div className="min-w-0">
+                              <p className="font-medium text-sm break-words">{template.name}</p>
                               <p className="text-xs text-muted-foreground">Version {template.version}</p>
                             </div>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 flex-shrink-0">
                             <Button size="sm" variant="outline">
                               <Download className="h-3 w-3" />
                             </Button>
@@ -821,7 +821,7 @@ export default function ContractManagement() {
                     <CardDescription>Contract approval process templates</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-4 min-w-0">
                       {[
                         {
                           workflow: "Standard Supply Contract",
@@ -839,21 +839,21 @@ export default function ContractManagement() {
                           duration: "7-10 days",
                         },
                       ].map((workflow, index) => (
-                        <div key={index} className="p-3 border border-border rounded-lg">
-                          <h4 className="font-medium text-sm mb-2">{workflow.workflow}</h4>
-                          <div className="flex items-center gap-2 mb-2">
+                        <div key={index} className="p-3 border border-border rounded-lg min-w-0 overflow-hidden">
+                          <h4 className="font-medium text-sm mb-2 break-words leading-tight">{workflow.workflow}</h4>
+                          <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
                             {workflow.steps.map((step, stepIndex) => (
-                              <div key={stepIndex} className="flex items-center gap-1">
-                                <Badge variant="outline" className="text-xs">
+                              <div key={stepIndex} className="flex items-center gap-1 min-w-0">
+                                <Badge variant="outline" className="text-xs whitespace-nowrap px-2 py-1 max-w-[120px] truncate" title={step}>
                                   {step}
                                 </Badge>
                                 {stepIndex < workflow.steps.length - 1 && (
-                                  <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                                  <ChevronRight className="h-3 w-3 text-muted-foreground flex-shrink-0" />
                                 )}
                               </div>
                             ))}
                           </div>
-                          <p className="text-xs text-muted-foreground">Typical duration: {workflow.duration}</p>
+                          <p className="text-xs text-muted-foreground break-words leading-relaxed">Typical duration: {workflow.duration}</p>
                         </div>
                       ))}
                     </div>

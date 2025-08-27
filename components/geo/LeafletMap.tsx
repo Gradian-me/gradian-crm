@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Clock, MapPin, Phone, Square } from "lucide-react"
+import { Clock, MapPin, Phone, Square, AlertCircle } from "lucide-react"
 import dynamic from "next/dynamic"
 
 // Dynamically import Leaflet components to avoid SSR issues
@@ -63,11 +63,50 @@ export default function LeafletMap({
 }: LeafletMapProps) {
   const mapRef = useRef<any>(null)
   const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null)
+  const [isMapLoaded, setIsMapLoaded] = useState(false)
+  const [mapError, setMapError] = useState<string | null>(null)
+
+  // Debug logging
+  console.log('LeafletMap render:', { currentLocation, visits: visits.length, isTracking })
+
+  // Check if Leaflet is available
+  if (typeof window !== 'undefined' && !window.L) {
+    console.error('Leaflet is not loaded')
+  }
+  
+  // Check if Leaflet CSS is loaded
+  useEffect(() => {
+    const leafletStyles = document.querySelector('link[href*="leaflet"]')
+    if (!leafletStyles) {
+      console.error('Leaflet CSS not found')
+    } else {
+      console.log('Leaflet CSS found:', leafletStyles)
+    }
+    
+    // Check if Leaflet CSS is actually loaded
+    const checkLeafletCSS = () => {
+      const testElement = document.createElement('div')
+      testElement.className = 'leaflet-container'
+      document.body.appendChild(testElement)
+      
+      const computedStyle = window.getComputedStyle(testElement)
+      const hasLeafletStyles = computedStyle.position === 'relative' || computedStyle.position === 'absolute'
+      
+      console.log('Leaflet CSS loaded:', hasLeafletStyles)
+      console.log('Test element styles:', computedStyle.position)
+      
+      document.body.removeChild(testElement)
+    }
+    
+    // Check after a short delay
+    const timer = setTimeout(checkLeafletCSS, 2000)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Generate route coordinates for visualization
-  const routeCoordinates = [
+  const routeCoordinates: [number, number][] = [
     [currentLocation.lat, currentLocation.lng],
-    ...visits.map(visit => [visit.coordinates.lat, visit.coordinates.lng]),
+    ...visits.map(visit => [visit.coordinates.lat, visit.coordinates.lng] as [number, number]),
   ]
 
   const handleMarkerClick = (visit: Visit) => {
@@ -96,6 +135,41 @@ export default function LeafletMap({
     }
   }, [visits, currentLocation])
 
+  // Additional effect to ensure map is properly initialized
+  useEffect(() => {
+    console.log('Map container ref:', mapRef.current)
+    if (mapRef.current) {
+      console.log('Map container is available')
+    }
+    
+    // Set a timeout to show error if map doesn't load
+    const timeout = setTimeout(() => {
+      if (!isMapLoaded) {
+        console.error('Map failed to load within timeout')
+        setMapError('Map failed to load within 10 seconds')
+      }
+    }, 10000)
+    
+    return () => clearTimeout(timeout)
+  }, [isMapLoaded])
+
+  // Debug effect to check map container rendering
+  useEffect(() => {
+    const checkMapContainer = () => {
+      const mapElement = document.querySelector('.leaflet-container')
+      if (mapElement) {
+        console.log('Leaflet container found:', mapElement)
+        console.log('Container dimensions:', mapElement.getBoundingClientRect())
+      } else {
+        console.log('Leaflet container not found')
+      }
+    }
+    
+    // Check after a short delay to allow for rendering
+    const timer = setTimeout(checkMapContainer, 1000)
+    return () => clearTimeout(timer)
+  }, [])
+
   return (
     <div className="space-y-6">
       {/* Map Container */}
@@ -108,18 +182,75 @@ export default function LeafletMap({
           <CardDescription>Real-time location and visit status</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="relative h-[500px] rounded-lg overflow-hidden border">
+          <div 
+            className="relative h-[500px] rounded-lg overflow-hidden border bg-gray-100"
+            style={{ minHeight: '500px', position: 'relative' }}
+          >
+            {!isMapLoaded && !mapError && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-2"></div>
+                  <p className="text-sm text-gray-600">Loading map...</p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Current: {currentLocation.lat.toFixed(4)}, {currentLocation.lng.toFixed(4)}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Visits: {visits.length} | Tracking: {isTracking ? 'Active' : 'Paused'}
+                  </p>
+                </div>
+              </div>
+            )}
+            
+            {mapError && (
+              <div className="absolute inset-0 flex items-center justify-center bg-red-50 z-10">
+                <div className="text-center">
+                  <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+                  <p className="text-sm text-red-600 font-medium">Map Error</p>
+                  <p className="text-xs text-red-500 mt-1">{mapError}</p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Current: {currentLocation.lat.toFixed(4)}, {currentLocation.lng.toFixed(4)}
+                  </p>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="mt-2"
+                    onClick={() => {
+                      setMapError(null)
+                      setIsMapLoaded(false)
+                    }}
+                  >
+                    Retry
+                  </Button>
+                </div>
+              </div>
+            )}
             <MapContainer
-              style={{ height: "100%", width: "100%" }}
+              center={[currentLocation.lat, currentLocation.lng]}
+              zoom={13}
+              style={{ 
+                height: "100%", 
+                width: "100%", 
+                minHeight: "500px",
+                position: "relative",
+                zIndex: 1
+              }}
               ref={mapRef}
+              className="h-full w-full"
+              whenReady={() => {
+                console.log('Map is ready')
+                setIsMapLoaded(true)
+              }}
             >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                errorTileUrl="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
               />
 
               {/* Current Location Marker */}
               <Circle
                 center={[currentLocation.lat, currentLocation.lng]}
+                radius={100}
                 pathOptions={{
                   color: isTracking ? "#10b981" : "#6b7280",
                   fillColor: isTracking ? "#10b981" : "#6b7280",
