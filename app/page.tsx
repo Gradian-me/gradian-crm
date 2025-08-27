@@ -13,6 +13,8 @@ import {
   Package,
   Shield,
   BarChart3,
+  DollarSign,
+  Award,
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -21,6 +23,12 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MainLayout } from "@/components/layout/MainLayout"
 import { NoSSR } from "@/components/ui/no-ssr"
+import dynamic from "next/dynamic"
+import { applyChartTheme, chartTheme } from "@/lib/chart-theme"
+import { KPIGrid } from "@/components/analytics"
+
+// Dynamically import ECharts to avoid SSR issues
+const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false })
 
 
 const kpiData = [
@@ -93,6 +101,189 @@ const recentActivities = [
   },
 ]
 
+// ECharts options for enhanced analytics
+const getSalesTrendOption = () => applyChartTheme({
+  title: {
+    text: "Monthly Sales Performance",
+  },
+  tooltip: {
+    trigger: "axis",
+    formatter: function (params: any) {
+      return `${params[0].name}<br/>Revenue: $${params[0].value}K<br/>Visits: ${params[1].value}`;
+    },
+  },
+  legend: {
+    data: ["Revenue", "Field Visits"],
+  },
+  xAxis: {
+    type: "category",
+    data: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  },
+  yAxis: [
+    {
+      type: "value",
+      name: "Revenue ($K)",
+      position: "left",
+    },
+    {
+      type: "value",
+      name: "Visits",
+      position: "right",
+    },
+  ],
+  series: [
+    {
+      name: "Revenue",
+      type: "line",
+      yAxisIndex: 0,
+      data: [850, 920, 1050, 1200, 1100, 1250, 1300, 1400, 1350, 1500, 1600, 1700],
+    },
+    {
+      name: "Field Visits",
+      type: "bar",
+      yAxisIndex: 1,
+      data: [45, 52, 58, 65, 62, 68, 72, 75, 78, 82, 85, 89],
+    },
+  ],
+})
+
+const getTerritoryPerformanceOption = () => applyChartTheme({
+  title: {
+    text: "Territory Performance Overview",
+  },
+  tooltip: {
+    trigger: "axis",
+    axisPointer: {
+      type: "shadow"
+    },
+    formatter: function (params: any) {
+      return `${params[0].name}<br/>Coverage: ${params[0].value}%<br/>Performance: ${params[1].value}%`;
+    },
+  },
+  legend: {
+    data: ["Coverage", "Performance"],
+  },
+  xAxis: {
+    type: "category",
+    data: ["North", "South", "East", "West", "Central"],
+  },
+  yAxis: {
+    type: "value",
+    name: "Percentage (%)",
+    max: 100,
+  },
+  series: [
+    {
+      name: "Coverage",
+      type: "bar",
+      data: [92, 87, 95, 89, 94],
+    },
+    {
+      name: "Performance",
+      type: "bar",
+      data: [88, 82, 91, 85, 90],
+
+    },
+  ],
+})
+
+const getHCPEngagementOption = () => applyChartTheme({
+  title: {
+    text: "HCP Engagement by Specialty",
+  },
+  tooltip: {
+    trigger: "item",
+    formatter: "{a} <br/>{b}: {c}% ({d}%)",
+  },
+  legend: {
+    orient: "vertical",
+    left: "left",
+    top: "middle",
+  },
+  series: [
+    {
+      name: "Engagement",
+      type: "pie",
+      data: [
+        { value: 92, name: "Cardiology" },
+        { value: 88, name: "Neurology" },
+        { value: 85, name: "Orthopedics" },
+        { value: 78, name: "Dermatology" },
+        { value: 82, name: "Oncology" },
+      ],
+    },
+  ],
+}, chartTheme.schemes.extended)
+
+const getSampleDistributionOption = () => applyChartTheme({
+  title: {
+    text: "Sample Distribution Trends",
+  },
+  tooltip: {
+    trigger: "axis",
+  },
+  legend: {
+    data: ["Distributed", "Remaining", "Expired"],
+  },
+  xAxis: {
+    type: "category",
+    data: ["Q1", "Q2", "Q3", "Q4"],
+  },
+  yAxis: {
+    type: "value",
+    name: "Quantity",
+  },
+  series: [
+    {
+      name: "Distributed",
+      type: "bar",
+      stack: "total",
+      data: [120, 135, 150, 180],
+
+    },
+    {
+      name: "Remaining",
+      type: "bar",
+      stack: "total",
+      data: [80, 65, 50, 20],
+
+    },
+    {
+      name: "Expired",
+      type: "bar",
+      stack: "total",
+      data: [10, 15, 20, 25],
+
+    },
+  ],
+})
+
+const getComplianceTrendOption = () => applyChartTheme({
+  title: {
+    text: "Compliance Score Trends",
+  },
+  tooltip: {
+    trigger: "axis",
+  },
+  xAxis: {
+    type: "category",
+    data: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  },
+  yAxis: {
+    type: "value",
+    name: "Compliance Score (%)",
+    max: 100,
+  },
+  series: [
+    {
+      name: "Overall Score",
+      type: "line",
+      data: [85, 87, 89, 91, 88, 92, 94, 93, 95, 96, 94, 97],
+
+    },
+  ],
+})
+
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview")
 
@@ -112,61 +303,73 @@ export default function Dashboard() {
 
                 <TabsContent value="overview" className="space-y-6">
                   {/* KPI Cards */}
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    {kpiData.map((kpi, index) => (
-                      <motion.div
-                        key={kpi.title}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <Card>
-                          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
-                            <kpi.icon className="h-4 w-4 text-muted-foreground" />
-                          </CardHeader>
-                          <CardContent>
-                            <div className="text-2xl font-bold">{kpi.value}</div>
-                            <div className="flex items-center gap-1 text-xs">
-                              <span className={`font-medium ${kpi.trend === "up" ? "text-green-600" : "text-red-600"}`}>
-                                {kpi.change}
-                              </span>
-                              <span className="text-muted-foreground">from last month</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">{kpi.description}</p>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    ))}
+                  <KPIGrid
+                    metrics={kpiData.map((kpi) => ({
+                      title: kpi.title,
+                      value: kpi.value,
+                      change: kpi.change,
+                      trend: kpi.trend,
+                      period: "from last month",
+                      icon: kpi.icon,
+                      description: kpi.description,
+                    }))}
+                  />
+
+                  {/* Enhanced Analytics Charts - Row 1 */}
+                  <div className="grid gap-6 lg:grid-cols-2">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Sales Performance Trends</CardTitle>
+                        <CardDescription>Monthly revenue and field visit correlation</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ReactECharts option={getSalesTrendOption()} style={{ height: "300px" }} />
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>HCP Engagement Analysis</CardTitle>
+                        <CardDescription>Engagement rates by medical specialty</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ReactECharts option={getHCPEngagementOption()} style={{ height: "300px" }} />
+                      </CardContent>
+                    </Card>
                   </div>
 
-                  {/* Quick Actions & Territory Overview */}
+                  {/* Enhanced Analytics Charts - Row 2 */}
+                  <div className="grid gap-6 lg:grid-cols-2">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Sample Distribution Overview</CardTitle>
+                        <CardDescription>Quarterly sample distribution and inventory status</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ReactECharts option={getSampleDistributionOption()} style={{ height: "300px" }} />
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Compliance Score Progression</CardTitle>
+                        <CardDescription>Monthly compliance score trends with area fill</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ReactECharts option={getComplianceTrendOption()} style={{ height: "300px" }} />
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Territory Performance and Quick Actions */}
                   <div className="grid gap-6 lg:grid-cols-3">
                     <Card className="lg:col-span-2">
                       <CardHeader>
-                        <CardTitle>Territory Overview</CardTitle>
-                        <CardDescription>Your coverage area and visit distribution</CardDescription>
+                        <CardTitle>Territory Performance Overview</CardTitle>
+                        <CardDescription>Coverage and performance metrics by region</CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">Hospital Coverage</span>
-                            <span className="text-sm text-muted-foreground">85%</span>
-                          </div>
-                          <Progress value={85} className="h-2" />
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">Clinic Coverage</span>
-                            <span className="text-sm text-muted-foreground">72%</span>
-                          </div>
-                          <Progress value={72} className="h-2" />
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">Pharmacy Coverage</span>
-                            <span className="text-sm text-muted-foreground">91%</span>
-                          </div>
-                          <Progress value={91} className="h-2" />
-                        </div>
+                        <ReactECharts option={getTerritoryPerformanceOption()} style={{ height: "300px" }} />
                       </CardContent>
                     </Card>
 
@@ -195,6 +398,44 @@ export default function Dashboard() {
                       </CardContent>
                     </Card>
                   </div>
+
+                  {/* Additional Metrics Row */}
+                  <KPIGrid
+                    metrics={[
+                      {
+                        title: "Conversion Rate",
+                        value: "24.3%",
+                        change: "+2.1%",
+                        trend: "up",
+                        period: "from last month",
+                        icon: TrendingUp,
+                      },
+                      {
+                        title: "Avg. Deal Size",
+                        value: "$45K",
+                        change: "+8.5%",
+                        trend: "up",
+                        period: "from last month",
+                        icon: DollarSign,
+                      },
+                      {
+                        title: "Sales Cycle",
+                        value: "45 days",
+                        change: "-3 days",
+                        trend: "down" as const,
+                        period: "from last month",
+                        icon: Calendar,
+                      },
+                      {
+                        title: "Customer Satisfaction",
+                        value: "4.8/5",
+                        change: "+0.2",
+                        trend: "up",
+                        period: "from last month",
+                        icon: Award,
+                      },
+                    ]}
+                  />
                 </TabsContent>
 
                 <TabsContent value="activity" className="space-y-6">

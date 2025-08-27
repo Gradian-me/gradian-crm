@@ -31,6 +31,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { MainLayout } from "@/components/layout/MainLayout"
+import { NoSSR } from "@/components/ui/no-ssr"
+import LeafletMap from "@/components/geo/LeafletMap"
+import { KPIGrid } from "@/components/analytics"
 
 interface Visit {
   id: number
@@ -193,61 +196,35 @@ export default function FieldTracking() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Today's Visits</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{todayStats.totalVisits}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {todayStats.completedVisits} completed, {todayStats.inProgress} in progress
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Distance Traveled</CardTitle>
-                  <Car className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{todayStats.totalDistance}</div>
-                  <div className="text-xs text-muted-foreground">Across all visits today</div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Time Spent</CardTitle>
-                  <Timer className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{todayStats.totalTime}</div>
-                  <div className="text-xs text-muted-foreground">Total visit duration</div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Route Efficiency</CardTitle>
-                  <Target className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{todayStats.efficiency}%</div>
-                  <div className="text-xs text-muted-foreground">Optimized route performance</div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
+          <KPIGrid
+            metrics={[
+              {
+                title: "Today's Visits",
+                value: todayStats.totalVisits,
+                description: `${todayStats.completedVisits} completed, ${todayStats.inProgress} in progress`,
+                icon: Users,
+              },
+              {
+                title: "Distance Traveled",
+                value: todayStats.totalDistance,
+                description: "Across all visits today",
+                icon: Car,
+              },
+              {
+                title: "Time Spent",
+                value: todayStats.totalTime,
+                description: "Total visit duration",
+                icon: Timer,
+              },
+              {
+                title: "Route Efficiency",
+                value: `${todayStats.efficiency}%`,
+                description: "Optimized route performance",
+                icon: Target,
+                variant: todayStats.efficiency >= 80 ? "success" : todayStats.efficiency >= 60 ? "warning" : "danger",
+              },
+            ]}
+          />
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
@@ -258,9 +235,9 @@ export default function FieldTracking() {
             </TabsList>
 
             <TabsContent value="map" className="space-y-6">
-              <div className="grid gap-6 lg:grid-cols-3">
+              <div className="grid gap-6 lg:grid-cols-1">
                 {/* Map Container */}
-                <Card className="lg:col-span-2">
+                <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <MapPin className="h-5 w-5" />
@@ -269,125 +246,26 @@ export default function FieldTracking() {
                     <CardDescription>Real-time location and visit status</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="relative h-[400px] bg-muted rounded-lg overflow-hidden">
-                      {/* Simulated Map Interface */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-green-50">
-                        <div className="absolute top-4 left-4 bg-white rounded-lg p-2 shadow-md">
-                          <div className="flex items-center gap-2 text-sm">
-                            <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-                            Current Location
-                          </div>
-                        </div>
-
-                        {/* Visit Markers */}
-                        {mockVisits.map((visit, index) => {
-                          const StatusIcon = getStatusIcon(visit.status)
-                          return (
-                            <motion.div
-                              key={visit.id}
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ delay: index * 0.2 }}
-                              className={`absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2`}
-                              style={{
-                                top: `${20 + index * 80}px`,
-                                left: `${100 + index * 120}px`,
-                              }}
-                              onClick={() => setSelectedVisit(visit)}
-                            >
-                              <div
-                                className={`p-2 rounded-full shadow-lg ${
-                                  visit.status === "completed"
-                                    ? "bg-green-500"
-                                    : visit.status === "in-progress"
-                                      ? "bg-blue-500"
-                                      : "bg-yellow-500"
-                                }`}
-                              >
-                                <StatusIcon className="h-4 w-4 text-white" />
-                              </div>
-                              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-white rounded px-2 py-1 text-xs shadow-md whitespace-nowrap">
-                                {visit.hcp}
-                              </div>
-                            </motion.div>
-                          )
-                        })}
-
-                        {/* Route Lines */}
-                        <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                          <defs>
-                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
-                              <polygon points="0 0, 10 3.5, 0 7" fill="#6366f1" />
-                            </marker>
-                          </defs>
-                          <path
-                            d="M 100 100 Q 200 150 320 180 Q 440 220 560 300"
-                            stroke="#6366f1"
-                            strokeWidth="2"
-                            fill="none"
-                            strokeDasharray="5,5"
-                            markerEnd="url(#arrowhead)"
-                          />
-                        </svg>
-                      </div>
-                    </div>
+                    <NoSSR>
+                      <LeafletMap
+                        currentLocation={currentLocation}
+                        visits={mockVisits}
+                        isTracking={isTracking}
+                        onVisitSelect={(visit) => setSelectedVisit(visit)}
+                        onCheckIn={(visitId) => {
+                          // Handle check in logic
+                          console.log('Check in:', visitId)
+                        }}
+                        onCheckOut={(visitId) => {
+                          // Handle check out logic
+                          console.log('Check out:', visitId)
+                        }}
+                      />
+                    </NoSSR>
                   </CardContent>
                 </Card>
 
-                {/* Current Visit Info */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Current Visit</CardTitle>
-                    <CardDescription>Active visit details</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {mockVisits.find((v) => v.status === "in-progress") ? (
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                          <Avatar>
-                            <AvatarFallback>MC</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">Dr. Michael Chen</p>
-                            <p className="text-sm text-muted-foreground">Memorial Cancer Center</p>
-                          </div>
-                        </div>
 
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between text-sm">
-                            <span>Check-in Time</span>
-                            <span className="font-medium">11:00 AM</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span>Duration</span>
-                            <span className="font-medium">45 minutes</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span>Purpose</span>
-                            <span className="font-medium text-right">OncoTarget trial</span>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Button className="w-full bg-transparent" variant="outline">
-                            <Phone className="h-4 w-4 mr-2" />
-                            Call HCP
-                          </Button>
-                          <Button className="w-full">
-                            <Square className="h-4 w-4 mr-2" />
-                            Check Out
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8">
-                        <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <p className="text-muted-foreground">No active visits</p>
-                        <p className="text-sm text-muted-foreground">Next visit at 2:00 PM</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
               </div>
             </TabsContent>
 

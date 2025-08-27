@@ -197,7 +197,7 @@ export default function SalesFunnel() {
                   New Opportunity
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-5xl max-h-[90vh]">
+              <DialogContent className="max-w-6xl max-h-[90vh]">
                 <DialogHeader>
                   <DialogTitle>Create New Opportunity</DialogTitle>
                   <DialogDescription>Add a new sales opportunity to your pipeline</DialogDescription>

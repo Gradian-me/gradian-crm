@@ -9,6 +9,7 @@ import {
   Package,
   Shield,
   BarChart3,
+  Hexagon,
 } from "lucide-react"
 import {
   SidebarContent,
@@ -36,10 +37,10 @@ export function MainSidebar() {
       <SidebarHeader className="border-b border-border p-4">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Activity className="h-4 w-4" />
+            <Hexagon className="h-4 w-4" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">MedCRM</h2>
+            <h2 className="text-lg font-semibold">Gradian CRM</h2>
             <p className="text-xs text-muted-foreground">Sales Platform</p>
           </div>
         </div>

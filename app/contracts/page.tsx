@@ -251,7 +251,7 @@ export default function ContractManagement() {
                   New Contract
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-5xl max-h-[90vh]">
+              <DialogContent className="max-w-6xl max-h-[90vh]">
                 <DialogHeader>
                   <DialogTitle>Create New Contract</DialogTitle>
                   <DialogDescription>Add a new contract to your management system</DialogDescription>

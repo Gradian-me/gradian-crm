@@ -224,7 +224,7 @@ export default function HCPManagement() {
                   Add HCP
                 </Button>
               </DialogTrigger>
-                            <DialogContent className="max-w-5xl max-h-[90vh]">
+                            <DialogContent className="max-w-6xl max-h-[90vh]">
                 <DialogHeader>
                   <DialogTitle>Add New Healthcare Professional</DialogTitle>
                   <DialogDescription>
