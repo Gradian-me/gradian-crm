@@ -186,7 +186,7 @@ export default function SalesFunnel() {
       headerTitle="Sales Funnel & Tenders"
       headerSubtitle="Manage your sales pipeline and tender opportunities"
     >
-      <div className="flex-1 p-6">
+      <div className="p-6">
         <div className="space-y-6">
           {/* New Opportunity Button */}
           <div className="flex justify-end">
@@ -197,7 +197,7 @@ export default function SalesFunnel() {
                   New Opportunity
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-5xl max-h-[90vh]">
+              <DialogContent className="max-w-6xl max-h-[90vh]">
                 <DialogHeader>
                   <DialogTitle>Create New Opportunity</DialogTitle>
                   <DialogDescription>Add a new sales opportunity to your pipeline</DialogDescription>
@@ -696,7 +696,7 @@ export default function SalesFunnel() {
                     </div>
                     <div>
                       <label className="text-sm font-medium">Notes</label>
-                      <Textarea className="mt-1" value={selectedOpportunity.notes} rows={3} />
+                      <Textarea className="mt-1" value={selectedOpportunity.notes} rows={3} readOnly />
                     </div>
                   </TabsContent>
 

@@ -6,7 +6,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 
 export const metadata: Metadata = {
-  title: "MedCRM - Medical Sales Platform",
+  title: "Gradian CRM - Modern Sales Platform",
   description: "Professional CRM for medical device and pharmaceutical sales teams",
   generator: "v0.app",
 }

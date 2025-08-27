@@ -213,7 +213,7 @@ export default function HCPManagement() {
       headerTitle="HCP Management"
       headerSubtitle="Manage your healthcare professional relationships"
     >
-      <div className="flex-1 p-6">
+      <div className="p-6">
         <div className="space-y-6">
           {/* Add HCP Button */}
           <div className="flex justify-end">
@@ -224,7 +224,7 @@ export default function HCPManagement() {
                   Add HCP
                 </Button>
               </DialogTrigger>
-                            <DialogContent className="max-w-5xl max-h-[90vh]">
+                            <DialogContent className="max-w-6xl max-h-[90vh]">
                 <DialogHeader>
                   <DialogTitle>Add New Healthcare Professional</DialogTitle>
                   <DialogDescription>

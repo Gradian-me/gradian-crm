@@ -27,7 +27,7 @@ export function MainLayout({
         <Sidebar className="border-r border-border">
           <MainSidebar />
         </Sidebar>
-        <SidebarInset className="flex-1">
+        <SidebarInset className="flex-1 flex flex-col">
           <MainHeader
             title={headerTitle}
             subtitle={headerSubtitle}
@@ -35,7 +35,9 @@ export function MainLayout({
             showScheduleButton={showScheduleButton}
             customActions={customHeaderActions}
           />
-          {children}
+          <main className="flex-1 overflow-auto">
+            {children}
+          </main>
         </SidebarInset>
       </div>
     </SidebarProvider>
