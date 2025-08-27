@@ -947,7 +947,7 @@ export default function ContractManagement() {
                     </div>
                     <div>
                       <label className="text-sm font-medium">Notes</label>
-                      <Textarea className="mt-1" value={selectedContract.notes} rows={3} />
+                      <Textarea className="mt-1" value={selectedContract.notes} rows={3} readOnly />
                     </div>
                   </TabsContent>
 

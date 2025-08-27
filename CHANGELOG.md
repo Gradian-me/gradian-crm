@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-08-27 12:49:44] - Bug Fix: Add readOnly Prop to Textarea Components to Fix React Warning
+Date and Time of changes: 2025-08-27 12:49:44
+Detailed description of changes: Fixed React warning about form fields having a value prop without an onChange handler by adding readOnly prop to Textarea components used for displaying read-only data. The warning was occurring in contracts, sales, and field tracking pages where Textarea components were used to display notes and other information without edit functionality.
+Components affected: 
+- app/contracts/page.tsx (added readOnly to contract notes Textarea)
+- app/sales/page.tsx (added readOnly to opportunity notes Textarea)
+- app/field/page.tsx (added readOnly to visit notes Textarea)
+----
+
 ## [2025-08-27 12:28:24] - Bug Fix: Improve Form Builder Responsiveness and Modern UI
 Date and Time of changes: 2025-08-27 12:28:24
 Detailed description of changes: Enhanced the FormBuilder component with improved responsiveness, modern UI design, and better dialog integration. Updated the component to always use responsive grid layout (2 columns on desktop, 1 column on mobile) for optimal dialog experience. Added proper scrolling with max-height and overflow handling. Improved input styling with modern shadows, focus states, and dark mode support. Enhanced form layout with better spacing, typography, and visual hierarchy. Updated all dialog sizes to max-w-5xl for better form display.

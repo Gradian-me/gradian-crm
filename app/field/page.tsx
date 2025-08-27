@@ -674,7 +674,7 @@ export default function FieldTracking() {
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Visit Notes</label>
-                    <Textarea placeholder="Add visit notes..." value={selectedVisit.notes} rows={3} />
+                    <Textarea placeholder="Add visit notes..." value={selectedVisit.notes} rows={3} readOnly />
                   </div>
 
                   <div className="flex justify-end gap-2">

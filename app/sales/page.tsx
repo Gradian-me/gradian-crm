@@ -696,7 +696,7 @@ export default function SalesFunnel() {
                     </div>
                     <div>
                       <label className="text-sm font-medium">Notes</label>
-                      <Textarea className="mt-1" value={selectedOpportunity.notes} rows={3} />
+                      <Textarea className="mt-1" value={selectedOpportunity.notes} rows={3} readOnly />
                     </div>
                   </TabsContent>
 
