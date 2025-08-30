@@ -10,24 +10,8 @@ import {
   Download,
   Eye,
   Edit,
-  Trash2,
   AlertTriangle,
-  CheckCircle,
-  Clock,
-  TrendingUp,
-  MapPin,
-  Calendar,
-  Users,
-  Warehouse,
   Truck,
-  BarChart3,
-  Settings,
-  RefreshCw,
-  FileText,
-  Archive,
-  AlertCircle,
-  DollarSign,
-  Activity,
   Upload,
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -36,7 +20,6 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MainLayout } from "@/components/layout/MainLayout"
-import { NoSSR } from "@/components/ui/no-ssr"
 import dynamic from "next/dynamic"
 import { applyChartTheme, chartTheme } from "@/lib/chart-theme"
 import { KPIGrid } from "@/components/analytics"
@@ -357,13 +340,13 @@ export default function InventoryPage() {
                 title: "Total Quantity",
                 value: totalQuantity.toString(),
                 description: "Units across all products",
-                icon: Warehouse,
+                icon: Truck,
               },
               {
                 title: "Total Value",
                 value: `$${totalValue.toLocaleString()}`,
                 description: "Current inventory value",
-                icon: DollarSign,
+                icon: AlertTriangle,
               },
               {
                 title: "Low Stock Alerts",
@@ -591,11 +574,11 @@ export default function InventoryPage() {
                       Record Transaction
                     </Button>
                     <Button className="w-full justify-start" variant="outline">
-                      <BarChart3 className="h-4 w-4 mr-2" />
+                      <AlertTriangle className="h-4 w-4 mr-2" />
                       Generate Report
                     </Button>
                     <Button className="w-full justify-start" variant="outline">
-                      <Settings className="h-4 w-4 mr-2" />
+                      <Edit className="h-4 w-4 mr-2" />
                       Inventory Settings
                     </Button>
                   </CardContent>

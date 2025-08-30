@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -11,11 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MainLayout } from "@/components/layout/MainLayout"
 import { DeviceGrid } from "@/components/medical"
 import { medicalDevices, deviceCategories, getDevicesByCategory } from "@/lib/medical-devices"
+import Image from "next/image"
 import { 
   Search, 
-  Filter, 
-  Grid3X3, 
-  List, 
   ShoppingCart, 
   Package, 
   TrendingUp, 
@@ -42,12 +39,12 @@ export default function DevicesPage() {
     return getDevicesByCategory(category).length
   }
 
-  const handleAddToCart = (device: any) => {
+  const handleAddToCart = (device: { name: string }) => {
     console.log('Added to cart:', device.name)
     // Handle adding device to cart/order
   }
 
-  const handleViewDetails = (device: any) => {
+  const handleViewDetails = (device: { name: string }) => {
     console.log('Viewing device:', device.name)
     // Handle device details view
   }
@@ -318,7 +315,7 @@ export default function DevicesPage() {
                           <tr key={device.id} className="hover:bg-gray-50">
                             <td className="p-3">
                               <div className="flex items-center gap-3">
-                                <img src={device.image} alt={device.name} className="w-10 h-10 rounded-lg object-cover" />
+                                <Image src={device.image} alt={device.name} width={40} height={40} className="w-10 h-10 rounded-lg object-cover" />
                                 <div>
                                   <p className="font-medium">{device.name}</p>
                                   <p className="text-sm text-muted-foreground">{device.manufacturer}</p>

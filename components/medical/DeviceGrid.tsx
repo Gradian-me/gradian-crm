@@ -6,14 +6,13 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Filter, Grid3X3, List, ShoppingCart } from "lucide-react"
+import { Search, Grid3X3, List, ShoppingCart } from "lucide-react"
 import { DeviceCard } from "./DeviceCard"
-import { MedicalDevice, deviceCategories, searchDevices, getDevicesByCategory } from "@/lib/medical-devices"
+import { MedicalDevice, deviceCategories, searchDevices, getDevicesByCategory, medicalDevices } from "@/lib/medical-devices"
 
 interface DeviceGridProps {
   devices?: MedicalDevice[]
   onAddToCart?: (device: MedicalDevice) => void
-  onViewDetails?: (device: MedicalDevice) => void
   showFilters?: boolean
   showSearch?: boolean
   layout?: 'grid' | 'list'
@@ -22,7 +21,6 @@ interface DeviceGridProps {
 export function DeviceGrid({ 
   devices: initialDevices, 
   onAddToCart, 
-  onViewDetails,
   showFilters = true,
   showSearch = true,
   layout = 'grid'
@@ -33,7 +31,7 @@ export function DeviceGrid({
   const [cartItems, setCartItems] = useState<MedicalDevice[]>([])
 
   // Use provided devices or default to all devices
-  const allDevices = initialDevices || require("@/lib/medical-devices").medicalDevices
+  const allDevices = initialDevices || medicalDevices
 
   // Filter devices based on search and category
   const filteredDevices = useMemo(() => {
@@ -59,10 +57,6 @@ export function DeviceGrid({
   const handleAddToCart = (device: MedicalDevice) => {
     setCartItems(prev => [...prev, device])
     onAddToCart?.(device)
-  }
-
-  const handleViewDetails = (device: MedicalDevice) => {
-    onViewDetails?.(device)
   }
 
   const clearFilters = () => {
@@ -146,7 +140,7 @@ export function DeviceGrid({
           <span className="text-sm text-muted-foreground">Active filters:</span>
           {searchQuery && (
             <Badge variant="outline" className="gap-1">
-              Search: "{searchQuery}"
+              Search: &quot;{searchQuery}&quot;
               <Button
                 variant="ghost"
                 size="sm"
@@ -211,7 +205,6 @@ export function DeviceGrid({
               <DeviceCard
                 device={device}
                 onAddToCart={handleAddToCart}
-                onViewDetails={handleViewDetails}
               />
             </motion.div>
           ))}
