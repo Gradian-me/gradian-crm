@@ -6,6 +6,24 @@ import { Button } from "@/components/ui/button"
 import { Clock, MapPin, Phone, Square, AlertCircle } from "lucide-react"
 import dynamic from "next/dynamic"
 
+// Import Leaflet CSS
+import "leaflet/dist/leaflet.css"
+
+// Ensure Leaflet CSS is loaded
+if (typeof window !== 'undefined') {
+  // Check if Leaflet CSS is already loaded
+  const leafletCSS = document.querySelector('link[href*="leaflet"]')
+  if (!leafletCSS) {
+    // Dynamically load Leaflet CSS if not present
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+    link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='
+    link.crossOrigin = ''
+    document.head.appendChild(link)
+  }
+}
+
 // Dynamically import Leaflet components to avoid SSR issues
 const MapContainer = dynamic(() => import("react-leaflet").then((mod) => mod.MapContainer), { ssr: false })
 const TileLayer = dynamic(() => import("react-leaflet").then((mod) => mod.TileLayer), { ssr: false })
@@ -66,41 +84,48 @@ export default function LeafletMap({
   const [isMapLoaded, setIsMapLoaded] = useState(false)
   const [mapError, setMapError] = useState<string | null>(null)
 
+  // Fix Leaflet marker icon issue
+  useEffect(() => {
+    const fixMarkerIcons = () => {
+      if (typeof window !== 'undefined' && window.L) {
+        try {
+          // Fix the default marker icon issue
+          delete (window.L.Icon.Default.prototype as any)._getIconUrl
+          window.L.Icon.Default.mergeOptions({
+            iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+            iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+          })
+          console.log('Marker icons fixed successfully')
+        } catch (error) {
+          console.error('Error fixing marker icons:', error)
+        }
+      } else {
+        // Retry after a short delay if Leaflet is not yet loaded
+        setTimeout(fixMarkerIcons, 100)
+      }
+    }
+    
+    fixMarkerIcons()
+  }, [])
+
   // Debug logging
   console.log('LeafletMap render:', { currentLocation, visits: visits.length, isTracking })
 
   // Check if Leaflet is available
-  if (typeof window !== 'undefined' && !window.L) {
-    console.error('Leaflet is not loaded')
-  }
-  
-  // Check if Leaflet CSS is loaded
   useEffect(() => {
-    const leafletStyles = document.querySelector('link[href*="leaflet"]')
-    if (!leafletStyles) {
-      console.error('Leaflet CSS not found')
-    } else {
-      console.log('Leaflet CSS found:', leafletStyles)
+    const checkLeaflet = () => {
+      if (typeof window !== 'undefined' && window.L) {
+        console.log('Leaflet is loaded:', window.L.version)
+        setIsMapLoaded(true)
+      } else {
+        console.log('Leaflet not yet loaded, retrying...')
+        // Retry after a short delay
+        setTimeout(checkLeaflet, 100)
+      }
     }
     
-    // Check if Leaflet CSS is actually loaded
-    const checkLeafletCSS = () => {
-      const testElement = document.createElement('div')
-      testElement.className = 'leaflet-container'
-      document.body.appendChild(testElement)
-      
-      const computedStyle = window.getComputedStyle(testElement)
-      const hasLeafletStyles = computedStyle.position === 'relative' || computedStyle.position === 'absolute'
-      
-      console.log('Leaflet CSS loaded:', hasLeafletStyles)
-      console.log('Test element styles:', computedStyle.position)
-      
-      document.body.removeChild(testElement)
-    }
-    
-    // Check after a short delay
-    const timer = setTimeout(checkLeafletCSS, 2000)
-    return () => clearTimeout(timer)
+    checkLeaflet()
   }, [])
 
   // Generate route coordinates for visualization
@@ -139,16 +164,16 @@ export default function LeafletMap({
       console.log('Map container is available')
     }
     
-    // Set a timeout to show error if map doesn't load
-    const timeout = setTimeout(() => {
-      if (!isMapLoaded) {
-        console.error('Map failed to load within timeout')
-        setMapError('Map failed to load within 10 seconds')
-      }
-    }, 10000)
-    
-    return () => clearTimeout(timeout)
-  }, [isMapLoaded])
+      // Set a timeout to show error if map doesn't load
+  const timeout = setTimeout(() => {
+    if (!isMapLoaded) {
+      console.error('Map failed to load within timeout')
+      setMapError('Map failed to load. Please refresh the page or check your internet connection.')
+    }
+  }, 15000)
+  
+  return () => clearTimeout(timeout)
+}, [isMapLoaded])
 
   // Debug effect to check map container rendering
   useEffect(() => {
@@ -189,11 +214,17 @@ export default function LeafletMap({
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-2"></div>
                   <p className="text-sm text-gray-600">Loading map...</p>
                   <p className="text-xs text-gray-500 mt-2">
-                    Current: {currentLocation.lat.toFixed(4)}, {currentLocation.lng.toFixed(4)}
+                    Location: {currentLocation.lat.toFixed(4)}, {currentLocation.lng.toFixed(4)}
                   </p>
                   <p className="text-xs text-gray-500">
                     Visits: {visits.length} | Tracking: {isTracking ? 'Active' : 'Paused'}
                   </p>
+                  <div className="mt-3">
+                    <div className="w-32 bg-gray-200 rounded-full h-2 mx-auto">
+                      <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Initializing Leaflet...</p>
+                  </div>
                 </div>
               </div>
             )}
@@ -202,42 +233,57 @@ export default function LeafletMap({
               <div className="absolute inset-0 flex items-center justify-center bg-red-50 z-10">
                 <div className="text-center">
                   <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
-                  <p className="text-sm text-red-600 font-medium">Map Error</p>
+                  <p className="text-sm text-red-600 font-medium">Map Loading Error</p>
                   <p className="text-xs text-red-500 mt-1">{mapError}</p>
                   <p className="text-xs text-gray-500 mt-2">
-                    Current: {currentLocation.lat.toFixed(4)}, {currentLocation.lng.toFixed(4)}
+                    Location: {currentLocation.lat.toFixed(4)}, {currentLocation.lng.toFixed(4)}
                   </p>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="mt-2"
-                    onClick={() => {
-                      setMapError(null)
-                      setIsMapLoaded(false)
-                    }}
-                  >
-                    Retry
-                  </Button>
+                  <div className="mt-3 space-y-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => {
+                        setMapError(null)
+                        setIsMapLoaded(false)
+                        // Force a re-render to retry loading
+                        window.location.reload()
+                      }}
+                    >
+                      Reload Page
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      className="w-full"
+                      onClick={() => {
+                        setMapError(null)
+                        setIsMapLoaded(false)
+                      }}
+                    >
+                      Try Again
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
-            <MapContainer
-              center={[currentLocation.lat, currentLocation.lng]}
-              zoom={13}
-              style={{ 
-                height: "100%", 
-                width: "100%", 
-                minHeight: "500px",
-                position: "relative",
-                zIndex: 1
-              }}
-              ref={mapRef}
-              className="h-full w-full"
-              whenReady={() => {
-                console.log('Map is ready')
-                setIsMapLoaded(true)
-              }}
-            >
+            {isMapLoaded && (
+              <MapContainer
+                center={[currentLocation.lat, currentLocation.lng]}
+                zoom={13}
+                style={{ 
+                  height: "100%", 
+                  width: "100%", 
+                  minHeight: "500px",
+                  position: "relative",
+                  zIndex: 1
+                }}
+                ref={mapRef}
+                className="h-full w-full"
+                whenReady={() => {
+                  console.log('Map is ready')
+                }}
+              >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -337,7 +383,8 @@ export default function LeafletMap({
                   }}
                 />
               )}
-            </MapContainer>
+                          </MapContainer>
+            )}
           </div>
         </CardContent>
       </Card>

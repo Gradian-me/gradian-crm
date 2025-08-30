@@ -347,6 +347,12 @@ export default function AnalyticsPage() {
       declining: { color: "bg-red-100 text-red-800", text: "Declining" },
     }
     const config = statusConfig[status as keyof typeof statusConfig]
+    
+    // Handle undefined status with a fallback
+    if (!config) {
+      return <Badge className="bg-gray-100 text-gray-800">{status}</Badge>
+    }
+    
     return <Badge className={config.color}>{config.text}</Badge>
   }
 

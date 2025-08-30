@@ -221,6 +221,12 @@ export default function CompliancePage() {
       overdue: { color: "bg-red-100 text-red-800", text: "Overdue", icon: AlertTriangle },
     }
     const config = statusConfig[status as keyof typeof statusConfig]
+    
+    // Handle undefined status with a fallback
+    if (!config) {
+      return <Badge className="bg-gray-100 text-gray-800">{status}</Badge>
+    }
+    
     const Icon = config.icon
     return <Badge className={config.color}><Icon className="h-3 w-3 mr-1" />{config.text}</Badge>
   }
@@ -232,6 +238,12 @@ export default function CompliancePage() {
       low: { color: "bg-green-100 text-green-800", text: "Low" },
     }
     const config = priorityConfig[priority as keyof typeof priorityConfig]
+    
+    // Handle undefined priority with a fallback
+    if (!config) {
+      return <Badge className="bg-gray-100 text-gray-800">{priority}</Badge>
+    }
+    
     return <Badge className={config.color}>{config.text}</Badge>
   }
 
@@ -242,6 +254,12 @@ export default function CompliancePage() {
       high: { color: "bg-red-100 text-red-800", text: "High Risk" },
     }
     const config = riskConfig[risk as keyof typeof riskConfig]
+    
+    // Handle undefined risk with a fallback
+    if (!config) {
+      return <Badge className="bg-gray-100 text-gray-800">{risk}</Badge>
+    }
+    
     return <Badge className={config.color}>{config.text}</Badge>
   }
 

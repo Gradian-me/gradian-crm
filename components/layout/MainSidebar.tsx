@@ -10,6 +10,8 @@ import {
   Shield,
   BarChart3,
   Hexagon,
+  Stethoscope,
+  Warehouse,
 } from "lucide-react"
 import {
   SidebarContent,
@@ -26,6 +28,8 @@ const sidebarItems = [
   { icon: MapPin, label: "Field Tracking", href: "/field" },
   { icon: TrendingUp, label: "Sales Funnel", href: "/sales" },
   { icon: FileText, label: "Contracts", href: "/contracts" },
+  { icon: Stethoscope, label: "Medical Devices", href: "/devices" },
+  { icon: Warehouse, label: "Inventory Management", href: "/inventory" },
   { icon: Package, label: "Samples", href: "/samples" },
   { icon: Shield, label: "Compliance", href: "/compliance" },
   { icon: Activity, label: "Analytics", href: "/analytics" },
