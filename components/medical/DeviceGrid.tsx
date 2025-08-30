@@ -13,6 +13,7 @@ import { MedicalDevice, deviceCategories, searchDevices, getDevicesByCategory, m
 interface DeviceGridProps {
   devices?: MedicalDevice[]
   onAddToCart?: (device: MedicalDevice) => void
+  onViewDetails?: (device: MedicalDevice) => void
   showFilters?: boolean
   showSearch?: boolean
   layout?: 'grid' | 'list'
@@ -21,6 +22,7 @@ interface DeviceGridProps {
 export function DeviceGrid({ 
   devices: initialDevices, 
   onAddToCart, 
+  onViewDetails,
   showFilters = true,
   showSearch = true,
   layout = 'grid'
@@ -205,6 +207,7 @@ export function DeviceGrid({
               <DeviceCard
                 device={device}
                 onAddToCart={handleAddToCart}
+                onViewDetails={onViewDetails}
               />
             </motion.div>
           ))}

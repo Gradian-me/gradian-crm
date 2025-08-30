@@ -13,9 +13,10 @@ import Image from "next/image"
 interface DeviceCardProps {
   device: MedicalDevice
   onAddToCart?: (device: MedicalDevice) => void
+  onViewDetails?: (device: MedicalDevice) => void
 }
 
-export function DeviceCard({ device, onAddToCart }: DeviceCardProps) {
+export function DeviceCard({ device, onAddToCart, onViewDetails }: DeviceCardProps) {
   const [showDetails, setShowDetails] = useState(false)
 
   const getStatusIcon = (status: string) => {
@@ -118,7 +119,13 @@ export function DeviceCard({ device, onAddToCart }: DeviceCardProps) {
                 variant="outline" 
                 size="sm" 
                 className="flex-1 h-9 bg-white hover:bg-gray-50 border-gray-200 hover:border-gray-300 text-gray-700 hover:text-gray-900 transition-colors rounded-md"
-                onClick={() => setShowDetails(true)}
+                onClick={() => {
+                  if (onViewDetails) {
+                    onViewDetails(device)
+                  } else {
+                    setShowDetails(true)
+                  }
+                }}
               >
                 <Eye className="h-3 w-3 mr-1" />
                 Details
