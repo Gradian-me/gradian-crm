@@ -55,8 +55,8 @@ const mockVisits: Visit[] = [
   {
     id: 1,
     hcp: "Dr. Sarah Johnson",
-    institution: "City General Hospital",
-    address: "123 Medical Center Dr, New York, NY",
+    institution: "Baghdad Medical City",
+    address: "Al-Rusafa, Baghdad, Iraq",
     type: "hospital",
     status: "completed",
     checkIn: "09:15 AM",
@@ -64,15 +64,15 @@ const mockVisits: Visit[] = [
     duration: "1h 15m",
     purpose: "Product presentation - CardioStent Pro",
     notes: "Positive reception, requested samples",
-    coordinates: { lat: 40.7589, lng: -73.9851 },
-    distance: "2.3 miles",
+    coordinates: { lat: 33.3152, lng: 44.3661 },
+    distance: "2.3 km",
     specialty: "Cardiology",
   },
   {
     id: 2,
     hcp: "Dr. Michael Chen",
-    institution: "Memorial Cancer Center",
-    address: "456 Oncology Way, Boston, MA",
+    institution: "Ibn Al-Nafis Hospital",
+    address: "Al-Karkh, Baghdad, Iraq",
     type: "hospital",
     status: "in-progress",
     checkIn: "11:00 AM",
@@ -80,15 +80,15 @@ const mockVisits: Visit[] = [
     duration: "45m",
     purpose: "Follow-up meeting - OncoTarget trial",
     notes: "",
-    coordinates: { lat: 42.3601, lng: -71.0589 },
-    distance: "15.7 miles",
+    coordinates: { lat: 33.2985, lng: 44.3299 },
+    distance: "3.7 km",
     specialty: "Oncology",
   },
   {
     id: 3,
     hcp: "PharmaCare Distributors",
-    institution: "PharmaCare Inc.",
-    address: "789 Distribution Blvd, Chicago, IL",
+    institution: "PharmaCare Iraq",
+    address: "Al-Mansour, Baghdad, Iraq",
     type: "distributor",
     status: "scheduled",
     checkIn: null,
@@ -96,15 +96,15 @@ const mockVisits: Visit[] = [
     duration: "30m",
     purpose: "Contract renewal discussion",
     notes: "",
-    coordinates: { lat: 41.8781, lng: -87.6298 },
-    distance: "8.1 miles",
+    coordinates: { lat: 33.3075, lng: 44.3808 },
+    distance: "1.8 km",
     specialty: "Distribution",
   },
   {
     id: 4,
     hcp: "Dr. Emily Rodriguez",
-    institution: "Respiratory Health Clinic",
-    address: "321 Lung Care Ave, Los Angeles, CA",
+    institution: "Al-Yarmouk Teaching Hospital",
+    address: "Al-Yarmouk, Baghdad, Iraq",
     type: "clinic",
     status: "scheduled",
     checkIn: null,
@@ -112,8 +112,8 @@ const mockVisits: Visit[] = [
     duration: "1h",
     purpose: "New product introduction - BreathEasy",
     notes: "",
-    coordinates: { lat: 34.0522, lng: -118.2437 },
-    distance: "12.4 miles",
+    coordinates: { lat: 33.2847, lng: 44.3956 },
+    distance: "4.2 km",
     specialty: "Pulmonology",
   },
 ]
@@ -123,7 +123,7 @@ const todayStats = {
   completedVisits: 1,
   inProgress: 1,
   scheduled: 2,
-  totalDistance: "38.5 miles",
+  totalDistance: "12.0 km",
   totalTime: "4h 30m",
   efficiency: 87,
 }
@@ -246,7 +246,7 @@ export default function FieldTracking() {
                   <CardContent>
                     <NoSSR>
                       <LeafletMap
-                        currentLocation={{ lat: 40.7589, lng: -73.9851 }} // Mock current location
+                        currentLocation={{ lat: 33.3152, lng: 44.3661 }} // Current location in Baghdad
                         visits={mockVisits}
                         isTracking={isTracking}
                         onVisitSelect={(visit) => setSelectedVisit(visit)}
@@ -412,8 +412,8 @@ export default function FieldTracking() {
 
                       <div className="grid grid-cols-2 gap-4 text-center">
                         <div className="p-3 border border-border rounded-lg">
-                          <div className="text-lg font-bold text-blue-600">38.5</div>
-                          <div className="text-xs text-muted-foreground">Total Miles</div>
+                          <div className="text-lg font-bold text-blue-600">12.0</div>
+                          <div className="text-xs text-muted-foreground">Total Kilometers</div>
                         </div>
                         <div className="p-3 border border-border rounded-lg">
                           <div className="text-lg font-bold text-green-600">4h 30m</div>
@@ -498,7 +498,7 @@ export default function FieldTracking() {
                   </CardContent>
                 </Card>
               </div>
-            </TabsContent>
+                        </TabsContent>
           </Tabs>
 
           {/* Visit Detail Modal */}
