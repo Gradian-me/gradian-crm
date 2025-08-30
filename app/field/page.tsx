@@ -27,7 +27,6 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { MainLayout } from "@/components/layout/MainLayout"
@@ -132,7 +131,6 @@ const todayStats = {
 export default function FieldTracking() {
   const [activeTab, setActiveTab] = useState("map")
   const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null)
-  const [currentLocation, setCurrentLocation] = useState({ lat: 40.7589, lng: -73.9851 })
   const [isTracking, setIsTracking] = useState(true)
 
   const getStatusColor = (status: string) => {
@@ -248,7 +246,7 @@ export default function FieldTracking() {
                   <CardContent>
                     <NoSSR>
                       <LeafletMap
-                        currentLocation={currentLocation}
+                        currentLocation={{ lat: 40.7589, lng: -73.9851 }} // Mock current location
                         visits={mockVisits}
                         isTracking={isTracking}
                         onVisitSelect={(visit) => setSelectedVisit(visit)}
@@ -400,7 +398,7 @@ export default function FieldTracking() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Route Statistics</CardTitle>
-                    <CardDescription>Today's route performance</CardDescription>
+                    <CardDescription>Today&apos;s route performance</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -450,7 +448,7 @@ export default function FieldTracking() {
                     <div className="space-y-4">
                       {mockVisits
                         .filter((v) => v.status === "scheduled")
-                        .map((visit, index) => (
+                        .map((visit) => (
                           <div key={visit.id} className="flex items-center gap-4 p-3 border border-border rounded-lg">
                             <div className="text-center">
                               <div className="text-lg font-bold">2:00</div>

@@ -713,19 +713,19 @@ export default function ContractManagement() {
                     {mockContracts
                       .filter((contract) => contract.alerts.length > 0)
                       .flatMap((contract) =>
-                        contract.alerts.map((alert, index) => ({
+                        contract.alerts.map((alert) => ({
                           ...alert,
                           contractTitle: contract.title,
                           contractId: contract.id,
                           organization: contract.organization,
                         })),
                       )
-                      .map((alert, index) => (
+                      .map((alert) => (
                         <motion.div
-                          key={index}
+                          key={`${alert.contractId}-${alert.type}`}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
+                          transition={{ delay: 0.1 }}
                           className={`p-4 rounded-lg border-l-4 ${
                             alert.severity === "high"
                               ? "border-red-500 bg-red-50"
@@ -789,9 +789,9 @@ export default function ContractManagement() {
                         { name: "Distribution Agreement Template", type: "distribution", version: "v3.0" },
                         { name: "Service Contract Template", type: "service", version: "v2.3" },
                         { name: "Regulatory Agreement Template", type: "regulatory", version: "v1.5" },
-                      ].map((template, index) => (
+                      ].map((template) => (
                         <div
-                          key={index}
+                          key={template.name}
                           className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border border-border rounded-lg gap-3 min-w-0 overflow-hidden"
                         >
                           <div className="flex items-center gap-3">

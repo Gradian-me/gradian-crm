@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import {
-  Activity,
   Users,
   MapPin,
   FileText,
@@ -12,14 +11,11 @@ import {
   Calendar,
   Package,
   Shield,
-  BarChart3,
   DollarSign,
   Award,
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MainLayout } from "@/components/layout/MainLayout"
 import { NoSSR } from "@/components/ui/no-ssr"
@@ -108,7 +104,7 @@ const getSalesTrendOption = () => applyChartTheme({
   },
   tooltip: {
     trigger: "axis",
-    formatter: function (params: any) {
+    formatter: function (params: { name: string; value: number }[]) {
       return `${params[0].name}<br/>Revenue: $${params[0].value}K<br/>Visits: ${params[1].value}`;
     },
   },
@@ -156,7 +152,7 @@ const getTerritoryPerformanceOption = () => applyChartTheme({
     axisPointer: {
       type: "shadow"
     },
-    formatter: function (params: any) {
+    formatter: function (params: { name: string; value: number }[]) {
       return `${params[0].name}<br/>Coverage: ${params[0].value}%<br/>Performance: ${params[1].value}%`;
     },
   },
@@ -525,7 +521,7 @@ export default function Dashboard() {
 
                           <div className="p-3 border border-border rounded-lg">
                             <p className="text-sm font-medium">Schedule follow-ups</p>
-                            <p className="text-xs text-muted-foreground">5 HCPs haven't been visited in 30+ days</p>
+                            <p className="text-xs text-muted-foreground">5 HCPs haven&apos;t been visited in 30+ days</p>
                           </div>
 
                           <div className="p-3 border border-border rounded-lg">

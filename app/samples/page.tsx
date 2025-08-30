@@ -184,7 +184,7 @@ const getExpiryChartOption = () => applyChartTheme({
   },
   tooltip: {
     trigger: "axis",
-    formatter: function (params: any) {
+    formatter: function (params: { name: string; seriesName: string; value: number }[]) {
       return `${params[0].name}<br/>${params[0].seriesName}: ${params[0].value} days`;
     },
   },
