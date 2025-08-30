@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-08-30 13:36:43] - Bug Fix: Resolve Next.js Image Hostname Configuration Error
+Date and Time of changes: 2025-08-30 13:36:43
+Detailed description of changes: Fixed critical Next.js image loading error by configuring external image domains in next.config.ts and replacing external Amazon image URLs with local image paths. The error was caused by trying to load images from m.media-amazon.com without proper hostname configuration. Added remotePatterns configuration for Amazon, Unsplash, and placeholder image domains. Updated medical devices data to use local images from public/medical-devices folder instead of external URLs, improving performance and reliability while maintaining security.
+Components affected: 
+- next.config.ts (added images.remotePatterns configuration for external domains)
+- lib/medical-devices.ts (replaced external Amazon URLs with local image paths)
+----
+
 ## [2025-08-30 11:55:03] - Feature Minor: Implement Comprehensive Medical Representatives Module
 Date and Time of changes: 2025-08-30 11:55:03
 Detailed description of changes: Created a comprehensive Medical Representatives (Med Reps) module with performance tracking, activity monitoring, routing optimization, and achievement recognition. The module includes a modern tabbed interface with 5 main sections: Overview (rep performance and activities), Performance (detailed metrics and top products), Routing (route management and efficiency), Analytics (sales trends and metrics), and Champions (top performers and achievements). Added responsive design with skeleton loading states, integrated navigation in the main sidebar, and implemented best practices for medical sales team management. Features include individual performance metrics, route efficiency scoring, sales analytics, achievement badges, and comprehensive reporting capabilities.
