@@ -8,14 +8,14 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { CheckCircle, AlertCircle, XCircle, Info, ShoppingCart, Eye } from "lucide-react"
 import { MedicalDevice } from "@/lib/medical-devices"
+import Image from "next/image"
 
 interface DeviceCardProps {
   device: MedicalDevice
   onAddToCart?: (device: MedicalDevice) => void
-  onViewDetails?: (device: MedicalDevice) => void
 }
 
-export function DeviceCard({ device, onAddToCart, onViewDetails }: DeviceCardProps) {
+export function DeviceCard({ device, onAddToCart }: DeviceCardProps) {
   const [showDetails, setShowDetails] = useState(false)
 
   const getStatusIcon = (status: string) => {
@@ -75,9 +75,11 @@ export function DeviceCard({ device, onAddToCart, onViewDetails }: DeviceCardPro
             {/* Device Image */}
             <div className="flex justify-center">
               <div className="w-48 h-48 bg-gray-50 rounded-lg flex items-center justify-center p-4 group-hover:bg-gray-100 transition-colors">
-                <img 
+                <Image 
                   src={device.image} 
                   alt={device.name}
+                  width={192}
+                  height={192}
                   className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
                 />
               </div>
@@ -142,9 +144,11 @@ export function DeviceCard({ device, onAddToCart, onViewDetails }: DeviceCardPro
           <DialogHeader>
                             <DialogTitle className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center p-2">
-                    <img 
+                    <Image 
                       src={device.image} 
                       alt={device.name}
+                      width={48}
+                      height={48}
                       className="w-full h-full object-contain"
                     />
                   </div>
@@ -159,9 +163,11 @@ export function DeviceCard({ device, onAddToCart, onViewDetails }: DeviceCardPro
             {/* Device Image */}
             <div className="flex justify-center">
               <div className="w-64 h-64 bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl flex items-center justify-center p-8 shadow-lg">
-                <img 
+                <Image 
                   src={device.image} 
                   alt={device.name}
+                  width={256}
+                  height={256}
                   className="w-full h-full object-contain"
                 />
               </div>

@@ -14,7 +14,6 @@ import {
   Award,
   Calendar,
   Clock,
-  MapPin,
   TrendingUp,
   Users,
   Target,
@@ -22,14 +21,10 @@ import {
   Route,
   BarChart3,
   Trophy,
-  Zap,
   CheckCircle,
-  AlertCircle,
   Clock3,
   Navigation,
   DollarSign,
-  Package,
-  UserCheck,
 } from "lucide-react"
 
 // Mock data for med reps
