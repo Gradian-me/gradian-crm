@@ -54,7 +54,24 @@ const funnelStages = [
   { id: "lost", name: "Lost", color: "bg-red-100 text-red-800", count: 1 },
 ]
 
-const mockOpportunities = [
+type Opportunity = {
+  id: number
+  title: string
+  organization: string
+  value: number
+  stage: string
+  probability: number
+  closeDate: string
+  lastActivity: string
+  source: string
+  contact: string
+  products: string[]
+  documents: string[]
+  notes: string
+  stakeholders: string[]
+}
+
+const mockOpportunities: Opportunity[] = [
   {
     id: 1,
     title: "Regional Hospital Network - CardioStent Pro",
@@ -147,12 +164,12 @@ const pipelineStats = {
 }
 
 export default function SalesFunnel() {
-  const [activeTab, setActiveTab] = useState("funnel")
-  const [selectedOpportunity, setSelectedOpportunity] = useState(null)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedStage, setSelectedStage] = useState("all")
+  const [activeTab, setActiveTab] = useState<string>("funnel")
+  const [selectedOpportunity, setSelectedOpportunity] = useState<Opportunity | null>(null)
+  const [searchTerm, setSearchTerm] = useState<string>("")
+  const [selectedStage, setSelectedStage] = useState<string>("all")
 
-  const filteredOpportunities = mockOpportunities.filter((opp) => {
+  const filteredOpportunities = mockOpportunities.filter((opp: Opportunity) => {
     const matchesSearch =
       opp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       opp.organization.toLowerCase().includes(searchTerm.toLowerCase())
@@ -160,12 +177,12 @@ export default function SalesFunnel() {
     return matchesSearch && matchesStage
   })
 
-  const getStageColor = (stage) => {
-    const stageInfo = funnelStages.find((s) => s.id === stage)
+  const getStageColor = (stage: string) => {
+    const stageInfo = funnelStages.find((s: { id: string; color: string }) => s.id === stage)
     return stageInfo ? stageInfo.color : "bg-gray-100 text-gray-800"
   }
 
-  const formatCurrency = (amount) => {
+  const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
@@ -174,7 +191,7 @@ export default function SalesFunnel() {
     }).format(amount)
   }
 
-  const getProbabilityColor = (probability) => {
+  const getProbabilityColor = (probability: number) => {
     if (probability >= 80) return "text-green-600"
     if (probability >= 60) return "text-blue-600"
     if (probability >= 40) return "text-yellow-600"
@@ -681,7 +698,7 @@ export default function SalesFunnel() {
                         <div>
                           <label className="text-sm font-medium">Products</label>
                           <div className="mt-1 flex flex-wrap gap-1">
-                            {selectedOpportunity.products.map((product) => (
+                            {selectedOpportunity.products.map((product: string) => (
                               <Badge key={product} variant="outline">
                                 {product}
                               </Badge>
@@ -702,13 +719,13 @@ export default function SalesFunnel() {
 
                   <TabsContent value="stakeholders" className="space-y-4">
                     <div className="space-y-3">
-                      {selectedOpportunity.stakeholders.map((stakeholder, index) => (
+                      {selectedOpportunity.stakeholders.map((stakeholder: string, index: number) => (
                         <div key={index} className="flex items-center gap-3 p-3 border border-border rounded-lg">
                           <Avatar>
                             <AvatarFallback>
                               {stakeholder
                                 .split(" ")
-                                .map((n) => n[0])
+                                .map((n: string) => n[0])
                                 .join("")}
                             </AvatarFallback>
                           </Avatar>
@@ -728,7 +745,7 @@ export default function SalesFunnel() {
 
                   <TabsContent value="documents" className="space-y-4">
                     <div className="space-y-3">
-                      {selectedOpportunity.documents.map((doc, index) => (
+                      {selectedOpportunity.documents.map((doc: string, index: number) => (
                         <div
                           key={index}
                           className="flex items-center justify-between p-3 border border-border rounded-lg"

@@ -121,8 +121,18 @@ export const chartTheme = {
   },
 }
 
+// Interface for chart series to avoid using 'any'
+interface ChartSeries {
+  type?: string
+  data?: Record<string, unknown>[]
+  itemStyle?: Record<string, unknown>
+  lineStyle?: Record<string, unknown>
+  areaStyle?: Record<string, unknown>
+  [key: string]: unknown
+}
+
 // Helper function to apply theme to chart options
-export function applyChartTheme(options: any, colorScheme: string[] = chartTheme.schemes.default) {
+export function applyChartTheme(options: Record<string, unknown>, colorScheme: string[] = chartTheme.schemes.default) {
   const themedOptions = { ...options }
   
   // Apply common theme
@@ -140,7 +150,7 @@ export function applyChartTheme(options: any, colorScheme: string[] = chartTheme
   
   if (themedOptions.xAxis) {
     if (Array.isArray(themedOptions.xAxis)) {
-      themedOptions.xAxis = themedOptions.xAxis.map((axis: any) => ({
+      themedOptions.xAxis = themedOptions.xAxis.map((axis: Record<string, unknown>) => ({
         ...chartTheme.common.xAxis,
         ...axis,
       }))
@@ -151,7 +161,7 @@ export function applyChartTheme(options: any, colorScheme: string[] = chartTheme
   
   if (themedOptions.yAxis) {
     if (Array.isArray(themedOptions.yAxis)) {
-      themedOptions.yAxis = themedOptions.yAxis.map((axis: any) => ({
+      themedOptions.yAxis = themedOptions.yAxis.map((axis: Record<string, unknown>) => ({
         ...chartTheme.common.yAxis,
         ...axis,
       }))
@@ -162,7 +172,7 @@ export function applyChartTheme(options: any, colorScheme: string[] = chartTheme
   
   // Apply colors to series
   if (themedOptions.series && Array.isArray(themedOptions.series)) {
-    themedOptions.series = themedOptions.series.map((series: any, index: number) => {
+    themedOptions.series = themedOptions.series.map((series: ChartSeries, index: number) => {
       const themedSeries = { ...series }
       
       // Apply chart-specific theme
@@ -172,7 +182,7 @@ export function applyChartTheme(options: any, colorScheme: string[] = chartTheme
       
       // Special handling for pie charts - assign individual colors to each data item
       if (series.type === 'pie' && series.data && Array.isArray(series.data)) {
-        themedSeries.data = series.data.map((item: any, dataIndex: number) => ({
+        themedSeries.data = series.data.map((item: Record<string, unknown>, dataIndex: number) => ({
           ...item,
           itemStyle: {
             color: colorScheme[dataIndex % colorScheme.length]
@@ -189,26 +199,32 @@ export function applyChartTheme(options: any, colorScheme: string[] = chartTheme
         }
         
         // Apply line color for line charts
-        if (series.type === 'line' && !themedSeries.lineStyle) {
-          themedSeries.lineStyle = {}
-        }
-        if (series.type === 'line' && !themedSeries.lineStyle.color) {
-          themedSeries.lineStyle.color = colorScheme[index % colorScheme.length]
+        if (series.type === 'line') {
+          if (!themedSeries.lineStyle) {
+            themedSeries.lineStyle = {}
+          }
+          if (!themedSeries.lineStyle.color) {
+            themedSeries.lineStyle.color = colorScheme[index % colorScheme.length]
+          }
         }
         
         // Apply area color for area charts
-        if (series.type === 'line' && series.areaStyle && !series.areaStyle.color) {
-          const baseColor = colorScheme[index % colorScheme.length]
-          themedSeries.areaStyle.color = {
-            type: "linear",
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: `${baseColor}4D` }, // 30% opacity
-              { offset: 1, color: `${baseColor}1A` }, // 10% opacity
-            ],
+        if (series.type === 'line' && series.areaStyle) {
+          if (!series.areaStyle.color) {
+            const baseColor = colorScheme[index % colorScheme.length]
+            if (themedSeries.areaStyle) {
+              themedSeries.areaStyle.color = {
+                type: "linear",
+                x: 0,
+                y: 0,
+                x2: 0,
+                y2: 1,
+                colorStops: [
+                  { offset: 0, color: `${baseColor}4D` }, // 30% opacity
+                  { offset: 1, color: `${baseColor}1A` }, // 10% opacity
+                ],
+              }
+            }
           }
         }
       }

@@ -13,7 +13,6 @@ import {
   Search,
   Filter,
   TrendingUp,
-  TrendingDown,
   Users,
   Calendar,
   BarChart3,
@@ -156,7 +155,7 @@ const getRiskAssessmentOption = () => applyChartTheme({
   },
   tooltip: {
     trigger: "axis",
-    formatter: function (params: any) {
+    formatter: function (params: { name: string; value: number }[]) {
       return `${params[0].name}<br/>Risk Level: ${params[0].value}`;
     },
   },

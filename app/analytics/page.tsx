@@ -3,30 +3,20 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import {
-  BarChart3,
   TrendingUp,
-  TrendingDown,
   Users,
   MapPin,
   DollarSign,
   Calendar,
   Target,
-  Award,
-  Activity,
-  PieChart,
-  LineChart,
   Download,
   Filter,
-  Search,
   Eye,
   ExternalLink,
-  ArrowUpRight,
-  ArrowDownRight,
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MainLayout } from "@/components/layout/MainLayout"
 import { NoSSR } from "@/components/ui/no-ssr"
@@ -119,7 +109,7 @@ const getRevenueChartOption = () => applyChartTheme({
   },
   tooltip: {
     trigger: "axis",
-    formatter: function (params: any) {
+    formatter: function (params: { name: string; value: number }[]) {
       return `${params[0].name}<br/>Revenue: $${params[0].value}K`;
     },
   },
@@ -211,7 +201,7 @@ const getSalesFunnelOption = () => applyChartTheme({
   },
   tooltip: {
     trigger: "item",
-    formatter: function(params: any) {
+    formatter: function(params: { name: string; value: number }) {
       const stage = params.name;
       const value = params.value;
       let conversionRate = "";
@@ -259,7 +249,7 @@ const getSalesFunnelOption = () => applyChartTheme({
         fontSize: 14,
         fontWeight: "bold",
         color: "#ffffff",
-        formatter: function(params: any) {
+        formatter: function(params: { name: string; value: number }) {
           return `${params.name}\n${params.value}`;
         },
       },
@@ -348,20 +338,7 @@ const getTrendAnalysisOption = () => applyChartTheme({
 
 export default function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState("overview")
-  const [searchTerm, setSearchTerm] = useState("")
-
-  const filteredPerformers = topPerformers.filter(performer =>
-    performer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    performer.hospital.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    performer.specialty.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-
-  const getTrendIcon = (trend: string) => {
-    if (trend === "up") {
-      return <ArrowUpRight className="h-4 w-4 text-green-600" />
-    }
-    return <ArrowDownRight className="h-4 w-4 text-red-600" />
-  }
+  // Removed unused variables and functions to fix linting errors
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -621,7 +598,7 @@ export default function AnalyticsPage() {
                         { region: "East Region", coverage: 95, performance: 92, hcps: 52 },
                         { region: "West Region", coverage: 89, performance: 90, hcps: 41 },
                         { region: "Central Region", coverage: 94, performance: 93, hcps: 48 },
-                      ].map((territory, index) => (
+                      ].map((territory) => (
                         <div key={territory.region} className="flex items-center justify-between p-3 border rounded-lg">
                           <div>
                             <h4 className="font-medium">{territory.region}</h4>

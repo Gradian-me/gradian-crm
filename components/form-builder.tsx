@@ -5,9 +5,6 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { Badge } from './ui/badge'
-import { Separator } from './ui/separator'
 
 export interface FormField {
   name: string
@@ -23,7 +20,7 @@ export interface FormField {
     maxLength?: number
   }
   options?: Array<{ value: string; label: string }>
-  defaultValue?: any
+  defaultValue?: string | number | boolean
   helpText?: string
   disabled?: boolean
   className?: string
@@ -34,7 +31,7 @@ export interface FormSchema {
   description?: string
   fields: FormField[]
   submitText?: string
-  onSubmit?: (data: Record<string, any>) => void | Promise<void>
+  onSubmit?: (data: Record<string, string | number | boolean>) => void | Promise<void>
   layout?: 'vertical' | 'horizontal' | 'grid'
   columns?: number
   className?: string
@@ -42,7 +39,7 @@ export interface FormSchema {
 
 interface FormBuilderProps {
   schema: FormSchema
-  initialData?: Record<string, any>
+  initialData?: Record<string, string | number | boolean>
   className?: string
 }
 
@@ -51,11 +48,11 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   initialData = {},
   className = ''
 }) => {
-  const [formData, setFormData] = useState<Record<string, any>>(initialData)
+  const [formData, setFormData] = useState<Record<string, string | number | boolean>>(initialData)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleInputChange = (name: string, value: any) => {
+  const handleInputChange = (name: string, value: string | number | boolean) => {
     setFormData(prev => ({ ...prev, [name]: value }))
     // Clear error when user starts typing
     if (errors[name]) {
@@ -63,7 +60,21 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
     }
   }
 
-  const validateField = (field: FormField, value: any): string => {
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }))
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }))
+    }
+  }
+
+  const handleCheckboxChange = (name: string, checked: boolean) => {
+    setFormData(prev => ({ ...prev, [name]: checked }))
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }))
+    }
+  }
+
+  const validateField = (field: FormField, value: string | number | boolean): string => {
     if (field.required && (!value || value === '')) {
       return `${field.label} is required`
     }
@@ -71,7 +82,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
     if (field.validation) {
       const { pattern, min, max, minLength, maxLength } = field.validation
 
-      if (pattern && value && !new RegExp(pattern).test(value)) {
+      if (pattern && value && typeof value === 'string' && !new RegExp(pattern).test(value)) {
         return `${field.label} format is invalid`
       }
 
@@ -80,14 +91,14 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
       }
 
       if (max !== undefined && value !== '' && Number(value) > max) {
-        return `${field.label} must be at most ${max}`
+        return `${field.label} must be at least ${max}`
       }
 
-      if (minLength !== undefined && value && value.length < minLength) {
+      if (minLength !== undefined && value && typeof value === 'string' && value.length < minLength) {
         return `${field.label} must be at least ${minLength} characters`
       }
 
-      if (maxLength !== undefined && value && value.length > maxLength) {
+      if (maxLength !== undefined && value && typeof value === 'string' && value.length > maxLength) {
         return `${field.label} must be at most ${maxLength} characters`
       }
     }
@@ -137,7 +148,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
     const commonProps = {
       id: field.name,
       name: field.name,
-      value: fieldValue,
+      value: String(fieldValue),
       onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => 
         handleInputChange(field.name, e.target.value),
       placeholder: field.placeholder,
@@ -147,8 +158,8 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
     }
 
     const selectProps = {
-      value: fieldValue,
-      onValueChange: (value: string) => handleInputChange(field.name, value),
+      value: String(fieldValue),
+      onValueChange: (value: string) => handleSelectChange(field.name, value),
       disabled: field.disabled
     }
 
@@ -184,8 +195,8 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
             type="checkbox"
             id={field.name}
             name={field.name}
-            checked={fieldValue}
-            onChange={(e) => handleInputChange(field.name, e.target.checked)}
+            checked={Boolean(fieldValue)}
+            onChange={(e) => handleCheckboxChange(field.name, e.target.checked)}
             disabled={field.disabled}
             className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700"
           />

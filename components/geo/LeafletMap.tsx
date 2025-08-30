@@ -61,8 +61,8 @@ export default function LeafletMap({
   onCheckIn,
   onCheckOut,
 }: LeafletMapProps) {
-  const mapRef = useRef<any>(null)
-  const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null)
+  const mapRef = useRef<L.Map | null>(null)
+  // Removed unused selectedVisit state to fix linting error
   const [isMapLoaded, setIsMapLoaded] = useState(false)
   const [mapError, setMapError] = useState<string | null>(null)
 
@@ -110,26 +110,23 @@ export default function LeafletMap({
   ]
 
   const handleMarkerClick = (visit: Visit) => {
-    setSelectedVisit(visit)
     onVisitSelect(visit)
   }
 
   const handleCheckIn = (visitId: number) => {
     onCheckIn?.(visitId)
-    setSelectedVisit(null)
   }
 
   const handleCheckOut = (visitId: number) => {
     onCheckOut?.(visitId)
-    setSelectedVisit(null)
   }
 
   useEffect(() => {
     if (mapRef.current && visits.length > 0) {
       // Fit bounds when component mounts or visits change
-      const bounds = [
+      const bounds: L.LatLngBoundsLiteral = [
         [currentLocation.lat, currentLocation.lng],
-        ...visits.map(visit => [visit.coordinates.lat, visit.coordinates.lng])
+        ...visits.map(visit => [visit.coordinates.lat, visit.coordinates.lng] as [number, number])
       ]
       mapRef.current.fitBounds(bounds, { padding: [20, 20] })
     }

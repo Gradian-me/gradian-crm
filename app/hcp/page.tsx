@@ -40,7 +40,7 @@ import { MainLayout } from "@/components/layout/MainLayout"
 import FormBuilder from "@/components/form-builder"
 import { hcpFormSchema } from "@/lib/form-schemas"
 
-const specialtyIcons: Record<string, React.ComponentType<any>> = {
+const specialtyIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   Cardiology: Heart,
   Oncology: Zap,
   Pulmonology: Brain,
