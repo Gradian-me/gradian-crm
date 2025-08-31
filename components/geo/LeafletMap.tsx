@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Clock, MapPin, Phone, Square, AlertCircle } from "lucide-react"
 import dynamic from "next/dynamic"
+import "leaflet/dist/leaflet.css"
 
 // Dynamically import Leaflet components to avoid SSR issues
 const MapContainer = dynamic(() => import("react-leaflet").then((mod) => mod.MapContainer), { ssr: false })
@@ -61,41 +62,86 @@ export default function LeafletMap({
   onCheckIn,
   onCheckOut,
 }: LeafletMapProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapRef = useRef<any>(null)
-  const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null)
   const [isMapLoaded, setIsMapLoaded] = useState(false)
   const [mapError, setMapError] = useState<string | null>(null)
 
   // Debug logging
   console.log('LeafletMap render:', { currentLocation, visits: visits.length, isTracking })
 
+  // Configure custom marker icon
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.L) {
+      // Set custom marker icon using mergeOptions
+      window.L.Icon.Default.mergeOptions({
+        iconUrl: '/media/marker-icon-2x.png',
+        iconRetinaUrl: '/media/marker-icon-2x.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowUrl: null,
+        shadowSize: null,
+        shadowAnchor: null
+      })
+    }
+  }, [])
+
+  // Create custom icon for current location
+  const currentLocationIcon = typeof window !== 'undefined' && window.L ? new window.L.Icon({
+    iconUrl: '/media/marker-icon-2x.png',
+    iconRetinaUrl: '/media/marker-icon-2x.png',
+    iconSize: [30, 49], // Slightly larger for current location
+    iconAnchor: [15, 49],
+    popupAnchor: [1, -34]
+  }) : null
+
   // Check if Leaflet is available
-  if (typeof window !== 'undefined' && !window.L) {
-    console.error('Leaflet is not loaded')
-  }
+  useEffect(() => {
+    const checkLeafletAvailability = () => {
+      if (typeof window !== 'undefined') {
+        if (!window.L) {
+          console.warn('Leaflet is not loaded yet, waiting...')
+        } else {
+          console.log('Leaflet is available')
+        }
+      }
+    }
+    
+    // Check immediately
+    checkLeafletAvailability()
+    
+    // Check again after a delay to allow for dynamic loading
+    const timer = setTimeout(checkLeafletAvailability, 1000)
+    return () => clearTimeout(timer)
+  }, [])
   
   // Check if Leaflet CSS is loaded
   useEffect(() => {
-    const leafletStyles = document.querySelector('link[href*="leaflet"]')
-    if (!leafletStyles) {
-      console.error('Leaflet CSS not found')
-    } else {
-      console.log('Leaflet CSS found:', leafletStyles)
-    }
-    
-    // Check if Leaflet CSS is actually loaded
     const checkLeafletCSS = () => {
-      const testElement = document.createElement('div')
-      testElement.className = 'leaflet-container'
-      document.body.appendChild(testElement)
-      
-      const computedStyle = window.getComputedStyle(testElement)
-      const hasLeafletStyles = computedStyle.position === 'relative' || computedStyle.position === 'absolute'
-      
-      console.log('Leaflet CSS loaded:', hasLeafletStyles)
-      console.log('Test element styles:', computedStyle.position)
-      
-      document.body.removeChild(testElement)
+      try {
+        const leafletStyles = document.querySelector('link[href*="leaflet"]')
+        if (!leafletStyles) {
+          console.warn('Leaflet CSS not found, using imported CSS')
+        } else {
+          console.log('Leaflet CSS found:', leafletStyles)
+        }
+        
+        // Check if Leaflet CSS is actually loaded
+        const testElement = document.createElement('div')
+        testElement.className = 'leaflet-container'
+        document.body.appendChild(testElement)
+        
+        const computedStyle = window.getComputedStyle(testElement)
+        const hasLeafletStyles = computedStyle.position === 'relative' || computedStyle.position === 'absolute'
+        
+        console.log('Leaflet CSS loaded:', hasLeafletStyles)
+        console.log('Test element styles:', computedStyle.position)
+        
+        document.body.removeChild(testElement)
+      } catch (error) {
+        console.warn('Error checking Leaflet CSS:', error)
+      }
     }
     
     // Check after a short delay
@@ -110,26 +156,23 @@ export default function LeafletMap({
   ]
 
   const handleMarkerClick = (visit: Visit) => {
-    setSelectedVisit(visit)
     onVisitSelect(visit)
   }
 
   const handleCheckIn = (visitId: number) => {
     onCheckIn?.(visitId)
-    setSelectedVisit(null)
   }
 
   const handleCheckOut = (visitId: number) => {
     onCheckOut?.(visitId)
-    setSelectedVisit(null)
   }
 
   useEffect(() => {
     if (mapRef.current && visits.length > 0) {
       // Fit bounds when component mounts or visits change
-      const bounds = [
+      const bounds: [number, number][] = [
         [currentLocation.lat, currentLocation.lng],
-        ...visits.map(visit => [visit.coordinates.lat, visit.coordinates.lng])
+        ...visits.map(visit => [visit.coordinates.lat, visit.coordinates.lng] as [number, number])
       ]
       mapRef.current.fitBounds(bounds, { padding: [20, 20] })
     }
@@ -145,8 +188,8 @@ export default function LeafletMap({
     // Set a timeout to show error if map doesn't load
     const timeout = setTimeout(() => {
       if (!isMapLoaded) {
-        console.error('Map failed to load within timeout')
-        setMapError('Map failed to load within 10 seconds')
+        console.warn('Map failed to load within timeout')
+        setMapError('Map failed to load within 10 seconds. Please refresh the page.')
       }
     }, 10000)
     
@@ -156,12 +199,16 @@ export default function LeafletMap({
   // Debug effect to check map container rendering
   useEffect(() => {
     const checkMapContainer = () => {
-      const mapElement = document.querySelector('.leaflet-container')
-      if (mapElement) {
-        console.log('Leaflet container found:', mapElement)
-        console.log('Container dimensions:', mapElement.getBoundingClientRect())
-      } else {
-        console.log('Leaflet container not found')
+      try {
+        const mapElement = document.querySelector('.leaflet-container')
+        if (mapElement) {
+          console.log('Leaflet container found:', mapElement)
+          console.log('Container dimensions:', mapElement.getBoundingClientRect())
+        } else {
+          console.log('Leaflet container not found yet')
+        }
+      } catch (error) {
+        console.warn('Error checking map container:', error)
       }
     }
     

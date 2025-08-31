@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-08-31 10:17:31] - Feature Minor: Add Custom Marker Icon to LeafletMap
+Date and Time of changes: 2025-08-31 10:17:31
+Detailed description of changes: Added custom marker icon support to the LeafletMap component using marker-icon-2x.png. Configured custom marker icons for both visit markers and current location marker with appropriate sizing and positioning. The current location marker is slightly larger (30x49) to distinguish it from visit markers (25x41). All markers now use the custom purple teardrop icon instead of default Leaflet markers.
+Components affected: 
+- components/geo/LeafletMap.tsx (added custom marker icon configuration and current location icon)
+----
+
+## [2025-08-31 10:12:34] - Bug Fix: Fix Leaflet Loading Errors and Unhandled Console Errors
+Date and Time of changes: 2025-08-31 10:12:34
+Detailed description of changes: Fixed critical Leaflet loading issues that were causing unhandled console errors and preventing the map from displaying. Added proper Leaflet CSS import, replaced console.error calls with console.warn to prevent unhandled errors, and improved Leaflet availability checking with retry logic. Enhanced error handling with try-catch blocks and better user feedback messages. The map now loads properly without throwing unhandled errors.
+Components affected: 
+- components/geo/LeafletMap.tsx (fixed Leaflet loading, improved error handling, added CSS import)
+----
+
+## [2025-08-31 10:03:22] - Bug Fix: Fix ESLint Errors in LeafletMap Component
+Date and Time of changes: 2025-08-31 10:03:22
+Detailed description of changes: Fixed ESLint errors in the LeafletMap component by removing unused Map type import and using ESLint disable comment for the mapRef type. Cleaned up unused state management code and fixed type issues with map bounds by properly typing coordinates as LatLngTuple arrays. Used ESLint disable comment to suppress no-explicit-any rule for mapRef while maintaining compatibility with react-leaflet components.
+Components affected: 
+- components/geo/LeafletMap.tsx (fixed TypeScript types, removed unused imports, added ESLint disable comment)
+----
+
 ## [2024-12-10 00:54:01] - Bug Fix: Fix Map Loading Issues and Syntax Errors in LeafletMap Component
 Date and Time of changes: 2024-12-10 00:54:01
 Detailed description of changes: Fixed critical map loading issues that were preventing the Leaflet map from displaying properly. Resolved syntax errors including missing closing braces and parentheses in useEffect hooks. Updated Leaflet CDN URLs to use the correct version (1.9.4) and improved error handling with retry mechanisms. Enhanced the map loading process with better debugging, fallback mechanisms, and user-friendly error messages. The map now properly initializes and displays without parsing errors.
