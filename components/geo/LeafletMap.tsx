@@ -87,15 +87,6 @@ export default function LeafletMap({
     }
   }, [])
 
-  // Create custom icon for current location
-  const currentLocationIcon = typeof window !== 'undefined' && window.L ? new window.L.Icon({
-    iconUrl: '/media/marker-icon-2x.png',
-    iconRetinaUrl: '/media/marker-icon-2x.png',
-    iconSize: [30, 49], // Slightly larger for current location
-    iconAnchor: [15, 49],
-    popupAnchor: [1, -34]
-  }) : null
-
   // Check if Leaflet is available
   useEffect(() => {
     const checkLeafletAvailability = () => {
