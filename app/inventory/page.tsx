@@ -317,7 +317,7 @@ export default function InventoryPage() {
         </div>
       }
     >
-      <div className="p-6">
+      <div className="p-2 md:p-4 lg:p-6">
         <div className="space-y-6">
           {/* Page Header */}
           <div className="text-center">
@@ -360,23 +360,23 @@ export default function InventoryPage() {
 
           {/* Main Content Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="inventory">Inventory</TabsTrigger>
-              <TabsTrigger value="transactions">Transactions</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:w-[500px]">
+              <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+              <TabsTrigger value="inventory" className="text-xs sm:text-sm">Inventory</TabsTrigger>
+              <TabsTrigger value="transactions" className="text-xs sm:text-sm">Transactions</TabsTrigger>
+              <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
               {/* Charts Row */}
-              <div className="grid gap-6 lg:grid-cols-2">
+              <div className="grid gap-4 md:gap-6 md:grid-cols-2">
                 <Card>
                   <CardHeader>
                     <CardTitle>Inventory Distribution</CardTitle>
                     <CardDescription>Stock quantities by category</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ReactECharts option={getInventoryChartOption()} style={{ height: "300px" }} />
+                    <ReactECharts option={getInventoryChartOption()} style={{ height: "250px" }} className="min-h-[200px]" />
                   </CardContent>
                 </Card>
 
@@ -386,7 +386,7 @@ export default function InventoryPage() {
                     <CardDescription>Available vs reserved quantities</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ReactECharts option={getInventoryTrendOption()} style={{ height: "300px" }} />
+                    <ReactECharts option={getInventoryTrendOption()} style={{ height: "250px" }} className="min-h-[200px]" />
                   </CardContent>
                 </Card>
               </div>
@@ -398,7 +398,7 @@ export default function InventoryPage() {
                   <CardDescription>Total value by product</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ReactECharts option={getStockValueChartOption()} style={{ height: "300px" }} />
+                  <ReactECharts option={getStockValueChartOption()} style={{ height: "250px" }} className="min-h-[200px]" />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -411,7 +411,7 @@ export default function InventoryPage() {
                   <CardDescription>Manage and track all inventory products</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex gap-4 mb-4">
+                  <div className="flex flex-col sm:flex-row gap-4 mb-4">
                     <div className="flex-1 relative">
                       <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -421,14 +421,16 @@ export default function InventoryPage() {
                         className="pl-10"
                       />
                     </div>
-                    <Button variant="outline">
-                      <Filter className="h-4 w-4 mr-2" />
-                      Filters
-                    </Button>
-                    <Button variant="outline">
-                      <Download className="h-4 w-4 mr-2" />
-                      Export
-                    </Button>
+                    <div className="flex gap-2 sm:gap-4">
+                      <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                        <Filter className="h-4 w-4 mr-2" />
+                        <span className="hidden sm:inline">Filters</span>
+                      </Button>
+                      <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                        <Download className="h-4 w-4 mr-2" />
+                        <span className="hidden sm:inline">Export</span>
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="space-y-4">
@@ -438,40 +440,42 @@ export default function InventoryPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                        className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <div className="flex items-center gap-4 flex-1">
+                          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                             <Package className="h-6 w-6 text-primary" />
                           </div>
-                          <div>
-                            <h3 className="font-medium">{item.name}</h3>
-                            <p className="text-sm text-muted-foreground">SKU: {item.sku}</p>
-                            <p className="text-xs text-muted-foreground">{item.category} • {item.location}</p>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-medium truncate">{item.name}</h3>
+                            <p className="text-sm text-muted-foreground truncate">SKU: {item.sku}</p>
+                            <p className="text-xs text-muted-foreground truncate">{item.category} • {item.location}</p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-6">
-                          <div className="text-center">
+                        <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-6">
+                          <div className="text-center min-w-0">
                             <p className="text-sm font-medium">{item.quantity}</p>
                             <p className="text-xs text-muted-foreground">Total</p>
                           </div>
-                          <div className="text-center">
+                          <div className="text-center min-w-0">
                             <p className="text-sm font-medium">{item.available}</p>
                             <p className="text-xs text-muted-foreground">Available</p>
                           </div>
-                          <div className="text-center">
+                          <div className="text-center min-w-0 hidden sm:block">
                             <p className="text-sm font-medium">${item.unitCost}</p>
                             <p className="text-xs text-muted-foreground">Unit Cost</p>
                           </div>
-                          <div className="text-center">
+                          <div className="text-center min-w-0">
                             <p className="text-sm font-medium">${item.totalValue.toLocaleString()}</p>
                             <p className="text-xs text-muted-foreground">Total Value</p>
                           </div>
-                          {getStatusBadge(item.status)}
+                          <div className="shrink-0">
+                            {getStatusBadge(item.status)}
+                          </div>
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 shrink-0 self-start sm:self-center">
                           <Button size="sm" variant="outline">
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -500,10 +504,10 @@ export default function InventoryPage() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                        className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
+                        <div className="flex items-center gap-4 flex-1">
+                          <div className={`h-12 w-12 rounded-full flex items-center justify-center shrink-0 ${
                             transaction.type === "inbound" ? "bg-green-100" :
                             transaction.type === "outbound" ? "bg-red-100" : "bg-blue-100"
                           }`}>
@@ -512,19 +516,21 @@ export default function InventoryPage() {
                               transaction.type === "outbound" ? "text-red-600" : "text-blue-600"
                             }`} />
                           </div>
-                          <div>
-                            <h3 className="font-medium">{transaction.description}</h3>
-                            <p className="text-sm text-muted-foreground">Ref: {transaction.reference}</p>
-                            <p className="text-xs text-muted-foreground">{transaction.location} • {transaction.date}</p>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-medium truncate">{transaction.description}</h3>
+                            <p className="text-sm text-muted-foreground truncate">Ref: {transaction.reference}</p>
+                            <p className="text-xs text-muted-foreground truncate">{transaction.location} • {transaction.date}</p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                          <div className="text-center">
+                        <div className="flex items-center gap-4 shrink-0">
+                          <div className="text-center min-w-0">
                             <p className="text-sm font-medium">{transaction.quantity}</p>
                             <p className="text-xs text-muted-foreground">Quantity</p>
                           </div>
-                          {getTransactionTypeBadge(transaction.type)}
+                          <div className="shrink-0">
+                            {getTransactionTypeBadge(transaction.type)}
+                          </div>
                           <div className="flex gap-2">
                             <Button size="sm" variant="outline">
                               <Eye className="h-4 w-4" />
@@ -539,14 +545,14 @@ export default function InventoryPage() {
             </TabsContent>
 
             <TabsContent value="analytics" className="space-y-6">
-              <div className="grid gap-6 lg:grid-cols-2">
+              <div className="grid gap-4 md:gap-6 md:grid-cols-2">
                 <Card>
                   <CardHeader>
                     <CardTitle>Stock Alerts</CardTitle>
                     <CardDescription>Items requiring attention</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <div className="p-3 bg-red-50 rounded-lg">
                         <h4 className="font-medium text-red-800">Critical Stock</h4>
                         <p className="text-sm text-red-600">{criticalStockItems} items below reorder point</p>
@@ -564,20 +570,20 @@ export default function InventoryPage() {
                     <CardTitle>Quick Actions</CardTitle>
                     <CardDescription>Common inventory tasks</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Button className="w-full justify-start" variant="outline">
+                  <CardContent className="space-y-2 sm:space-y-3">
+                    <Button className="w-full justify-start text-sm" variant="outline">
                       <Plus className="h-4 w-4 mr-2" />
                       Add New Item
                     </Button>
-                    <Button className="w-full justify-start" variant="outline">
+                    <Button className="w-full justify-start text-sm" variant="outline">
                       <Truck className="h-4 w-4 mr-2" />
                       Record Transaction
                     </Button>
-                    <Button className="w-full justify-start" variant="outline">
+                    <Button className="w-full justify-start text-sm" variant="outline">
                       <AlertTriangle className="h-4 w-4 mr-2" />
                       Generate Report
                     </Button>
-                    <Button className="w-full justify-start" variant="outline">
+                    <Button className="w-full justify-start text-sm" variant="outline">
                       <Edit className="h-4 w-4 mr-2" />
                       Inventory Settings
                     </Button>

@@ -2,6 +2,59 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-09-02 17:10:40] - Bug Fix: Improve Analytics Page Responsive Design for Top Performing HCPs Cards
+Date and Time of changes: 2025-09-02 17:10:40
+Detailed description of changes: Fixed responsiveness issues in the analytics page's "Top Performing HCPs" cards and overall layout that were not adapting properly to smaller screen sizes. Updated TabsList to use 2-column layout on mobile (grid-cols-2) and 4-column on larger screens (sm:grid-cols-4), added responsive text sizing for tab triggers. Fixed Top Performing HCPs cards to use flex-col on mobile and flex-row on larger screens, added proper text truncation and min-width constraints to prevent layout overflow. Improved chart container responsive design with better breakpoints (md:grid-cols-2 instead of lg:grid-cols-2) and optimized heights. Hidden visits column on mobile to save space while preserving essential revenue and growth information. Enhanced all grid layouts throughout the page for consistent responsive behavior across different content sections.
+Components affected:
+- app/analytics/page.tsx (improved tab responsive layout, fixed Top Performing HCPs card layouts for mobile, optimized chart responsiveness across all tabs, enhanced grid layouts for better mobile experience)
+----
+
+## [2025-09-02 17:03:15] - Bug Fix: Improve Inventory Page Responsive Design for Tabs and Cards
+Date and Time of changes: 2025-09-02 17:03:15
+Detailed description of changes: Fixed responsiveness issues in the inventory page tabs and cards that were not adapting properly to smaller screen sizes. Updated TabsList to use 2-column layout on mobile (grid-cols-2) and 4-column on larger screens (sm:grid-cols-4), added responsive text sizing (text-xs sm:text-sm) for tab triggers. Fixed inventory and transaction item cards to use flex-col on mobile and flex-row on larger screens, added proper text truncation and min-width constraints to prevent layout overflow. Improved search bar and action buttons layout with flex-col on mobile, optimized chart container heights and added responsive gap spacing throughout. Hidden unit cost column on mobile to save space while preserving essential information. Enhanced button responsiveness with size and text adjustments for better mobile usability.
+Components affected:
+- app/inventory/page.tsx (improved tab responsive layout, fixed card layouts for mobile, optimized chart responsiveness, enhanced search and action button layouts)
+----
+
+## [2025-09-02 16:18:20] - Bug Fix: Resolve Module Format Conflict in Samples Page
+Date and Time of changes: 2025-09-02 16:18:20
+Detailed description of changes: Fixed the persistent module format error in the samples page that was causing "Specified module format (CommonJs) is not matching the module format of the source code (EcmaScript Modules)" error. Applied comprehensive fixes including: temporarily removed echarts-for-react dynamic import and replaced with informative chart placeholders to isolate the module conflict, removed framer-motion animations that could be contributing to the module format issues, removed Turbopack flag from dev script to eliminate configuration conflicts, cleaned up Next.js configuration by removing experimental esmExternals that was incompatible with Turbopack, removed unnecessary NoSSR wrapper that was potentially causing conflicts, and replaced all motion components with standard divs to eliminate animation-related module conflicts.
+Components affected:
+- app/samples/page.tsx (removed echarts and framer-motion imports, replaced with placeholders and standard divs)
+- next.config.ts (cleaned up configuration, removed Turbopack-incompatible options)
+- package.json (removed --turbopack flag from dev script for better compatibility)
+----
+
+## [2025-09-02 15:54:42] - Bug Fix: Fix Online Badge Display in Responsive Header Layout
+Date and Time of changes: 2025-09-02 15:54:42
+Detailed description of changes: Fixed the online badge display issue in responsive mode in the main header component. Removed justify-between from header layout that was causing spacing issues, added proper width constraints with w-full sm:w-auto, improved flexbox alignment with justify-end sm:justify-start for mobile-first responsive design. Enhanced the online badge with flex-shrink-0 and min-w-fit to prevent shrinking, added green-themed styling with border-green-200 and bg-green-50/50 for better visibility, and improved responsive text handling with xs: breakpoints. Added pulse animation to the green status indicator dot and reduced mobile margin from mt-3 to mt-2 for better spacing. The header now properly displays the online badge completely across all screen sizes without cutoff or layout issues.
+Components affected: 
+- components/layout/MainHeader.tsx (improved responsive flexbox layout, enhanced online badge styling and constraints, fixed mobile spacing and alignment)
+----
+
+## [2025-09-02 15:52:41] - Feature Major: Integrate Real HCP Data into Sales Pipeline
+Date and Time of changes: 2025-09-02 15:52:41
+Detailed description of changes: Replaced mock sales data with real HCP (Healthcare Provider) data from lib/hcp-list.ts in the sales page. Updated the Opportunity interface to include HCP references and enhanced the sales funnel to dynamically generate opportunities based on actual HCP engagement scores, prescribing potential, and facility types. Added comprehensive HCP profile integration showing region, facility type, specialty, engagement scores, compliance status, and contact information. Enhanced search functionality to include HCP regions and types. Updated analytics to show regional performance and facility type distribution. The sales pipeline now reflects real data from 12 Iraqi healthcare facilities with calculated pipeline values, probabilities, and stages based on HCP characteristics.
+Components affected: 
+- app/sales/page.tsx (integrated HCP data, updated Opportunity interface, enhanced opportunity generation algorithm, added HCP profile tabs in opportunity details, improved search and analytics)
+- lib/hcp-list.ts (utilized existing HCP data structure and helper functions)
+----
+
+## [2025-09-02 15:48:59] - Bug Fix: Fix Leaflet Icon Creation Error
+Date and Time of changes: 2025-09-02 15:48:59
+Detailed description of changes: Fixed the TypeError "Cannot read properties of undefined (reading 'createIcon')" in the LeafletMap component. The issue was caused by attempting to create custom marker icons before Leaflet was fully loaded in the browser. Replaced the problematic custom icon logic with a proper Leaflet default icon initialization that correctly handles the dynamic loading of Leaflet in Next.js. The fix ensures markers display correctly without errors by using Leaflet's built-in icon merging functionality and proper timing for icon initialization.
+Components affected: 
+- components/geo/LeafletMap.tsx (simplified icon initialization, removed problematic custom icon creation, added proper Leaflet default icon configuration)
+----
+
+## [2024-12-10 00:55:30] - Refactor: Analyze and Document HCP Data Model Implementation
+Date and Time of changes: 2024-12-10 00:55:30
+Detailed description of changes: Analyzed the existing HCP (Healthcare Provider) data model and TypeScript implementation in lib/hcp-list.ts. The file already contains a comprehensive interface with all required fields (name, email, telephone, address, region, facilityType) from the provided hospital data, plus additional CRM-specific fields for engagement tracking, compliance monitoring, and field management. The data includes all 12 healthcare facilities from Iraq with proper typing, coordinates for mapping, and enriched metadata for CRM operations. The TypeScript implementation includes helper functions for filtering, searching, and data manipulation. Page integration is already functional with the HCP management interface properly consuming the typed data.
+Components affected: 
+- lib/hcp-list.ts (comprehensive HCP interface and data with 12 Iraqi healthcare facilities)
+- app/hcp/page.tsx (fully integrated with typed HCP data and filtering capabilities)
+----
+
 ## [2025-08-31 10:17:31] - Feature Minor: Add Custom Marker Icon to LeafletMap
 Date and Time of changes: 2025-08-31 10:17:31
 Detailed description of changes: Added custom marker icon support to the LeafletMap component using marker-icon-2x.png. Configured custom marker icons for both visit markers and current location marker with appropriate sizing and positioning. The current location marker is slightly larger (30x49) to distinguish it from visit markers (25x41). All markers now use the custom purple teardrop icon instead of default Leaflet markers.
@@ -303,4 +356,59 @@ Components affected:
 - components/theme-provider.tsx (new file)
 - package.json (added next-themes dependency, version bumped to 0.1.1)
 - app/layout.tsx (now properly imports ThemeProvider)
+---- 
+
+## [2025-09-02 16:39:38] - Feature Minor: Analytics Integration with HCP Data
+- Integrated real HCP data from lib/hcp-list.ts into analytics dashboard
+- Replaced mock performance metrics with calculated data from HCP engagement scores
+- Updated charts and visualizations to display actual HCP statistics
+- Added region-based analytics showing HCP distribution and engagement
+- Implemented specialty-based performance breakdown
+- Updated territory coverage analysis with real completion rates
+- Enhanced insights section with data-driven recommendations
+- Modified KPI metrics to reflect actual HCP counts, engagement scores, and visit data
+- Improved advanced metrics section with visit completion rates and sample distribution
+Components affected: app/analytics/page.tsx
+---- 
+
+## [2025-09-02 16:57:17] - Feature Minor: Inspirational Design Enhancement with Violet and Purple Gradients
+
+**Enhanced UI/UX with modern gradient design system:**
+
+### New Features:
+- Added comprehensive gradient utility classes in global CSS:
+  - `.card-important` - Violet gradient for high-priority cards
+  - `.card-featured` - Purple gradient for featured content
+  - `.card-highlight` - Mixed gradient for highlights  
+  - `.card-glass` - Glassmorphism effect for special cards
+  - `.btn-gradient` - Gradient button styling
+  - `.text-gradient` - Gradient text effect
+  - `.gradient-animated` - Animated gradient backgrounds
+
+### Design Improvements:
+- Enhanced global CSS with violet/purple gradient color variables
+- Added subtle gradient background to body element
+- Improved shadow effects with violet tints
+- Enhanced header component with gradient styling and text effects
+
+### Component Updates:
+- **MetricsCard**: Added gradient, purple, and featured variants with white text on gradients
+- **Button**: Added gradient, minimal, and glass variants
+- **MainHeader**: Enhanced with gradient background and gradient text titles
+- **Cards**: Applied gradient styling to important cards across all pages
+
+### Pages Enhanced:
+- **Dashboard**: Applied gradient styling to key KPI cards and chart containers
+- **Analytics**: Enhanced performance metrics and main charts with gradient backgrounds
+- **Sales**: Updated pipeline stats with gradient card styling
+- **Activity & Insights**: Improved card designs with gradient and glassmorphism effects
+
+### Visual Enhancements:
+- Minimal design principles with clean borders and subtle shadows
+- Improved hover effects with smooth transitions
+- Better color contrast with white text on gradient backgrounds
+- Enhanced focus states with violet-tinted ring colors
+
+**Components affected:** All major dashboard cards, MetricsCard, Button, MainHeader, global CSS utilities
+
 ---- 

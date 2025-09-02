@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
+// Temporarily commenting out framer-motion to test if it's causing the module conflict
+// import { motion } from "framer-motion"
 import {
   Package,
   Plus,
@@ -26,13 +27,23 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MainLayout } from "@/components/layout/MainLayout"
-import { NoSSR } from "@/components/ui/no-ssr"
-import dynamic from "next/dynamic"
-import { applyChartTheme, chartTheme } from "@/lib/chart-theme"
 import { KPIGrid } from "@/components/analytics"
 
-// Dynamically import ECharts to avoid SSR issues
-const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false })
+// Temporary chart placeholder to isolate the module issue
+const ChartPlaceholder = ({ title }: { title: string }) => (
+  <div className="h-[300px] flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded border-2 border-dashed border-gray-300">
+    <div className="text-center">
+      <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+        <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      </div>
+      <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
+      <p className="text-sm text-gray-500">Chart temporarily disabled</p>
+      <p className="text-xs text-gray-400 mt-1">Resolving module compatibility issues</p>
+    </div>
+  </div>
+)
 
 // Inventory data
 const inventoryData = [
@@ -159,98 +170,7 @@ const inventoryTransactions = [
   },
 ]
 
-// ECharts options
-const getInventoryChartOption = () => applyChartTheme({
-  title: {
-    text: "Inventory Overview by Category",
-  },
-  tooltip: {
-    trigger: "item",
-    formatter: "{a} <br/>{b}: {c} units ({d}%)",
-  },
-  legend: {
-    orient: "vertical",
-    left: "left",
-    top: "middle",
-  },
-  series: [
-    {
-      name: "Inventory Categories",
-      type: "pie",
-      data: [
-        { value: 150, name: "Cardiology" },
-        { value: 80, name: "Neurology" },
-        { value: 200, name: "Orthopedics" },
-        { value: 500, name: "Dermatology" },
-        { value: 12, name: "Respiratory" },
-      ],
-    },
-  ],
-}, chartTheme.schemes.extended)
-
-const getInventoryTrendOption = () => applyChartTheme({
-  title: {
-    text: "Inventory Levels by Product",
-  },
-  tooltip: {
-    trigger: "axis",
-  },
-  legend: {
-    data: ["Available", "Reserved", "Reorder Point"],
-  },
-  xAxis: {
-    type: "category",
-    data: ["CardioStent Pro", "NeuroFlow Device", "OrthoFix Implant", "DermaCare Cream", "Respiratory Monitor"],
-  },
-  yAxis: {
-    type: "value",
-    name: "Quantity",
-  },
-  series: [
-    {
-      name: "Available",
-      type: "bar",
-      data: [115, 52, 155, 320, 4],
-    },
-    {
-      name: "Reserved",
-      type: "bar",
-      data: [35, 28, 45, 180, 8],
-    },
-    {
-      name: "Reorder Point",
-      type: "line",
-      data: [20, 15, 30, 50, 10],
-    },
-  ],
-})
-
-const getStockValueChartOption = () => applyChartTheme({
-  title: {
-    text: "Inventory Value by Product",
-  },
-  tooltip: {
-    trigger: "axis",
-    formatter: function (params: { name: string; seriesName: string; value: number }[]) {
-      return `${params[0].name}<br/>${params[0].seriesName}: $${params[0].value.toLocaleString()}`;
-    },
-  },
-  xAxis: {
-    type: "category",
-    data: ["CardioStent Pro", "NeuroFlow Device", "OrthoFix Implant", "DermaCare Cream", "Respiratory Monitor"],
-  },
-  yAxis: {
-    type: "value",
-    name: "Value ($)",
-  },
-  series: [
-    {
-      name: "Days Until Expiry",
-      type: "line",
-      data: [187, 100, 396, 21],
-    },
-  ],
-})
+// Temporary removal of chart configurations to isolate module issue
 
 export default function SamplesPage() {
   const [activeTab, setActiveTab] = useState("overview")
@@ -290,9 +210,8 @@ export default function SamplesPage() {
         </Button>
       }
     >
-      <div className="p-6">
-        <NoSSR>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <div className="p-2 md:p-4 lg:p-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="inventory">Inventory</TabsTrigger>
@@ -342,7 +261,7 @@ export default function SamplesPage() {
                     <CardDescription>Sample quantities by category</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ReactECharts option={getInventoryChartOption()} style={{ height: "300px" }} />
+                    <ChartPlaceholder title="Inventory Distribution" />
                   </CardContent>
                 </Card>
 
@@ -352,7 +271,7 @@ export default function SamplesPage() {
                     <CardDescription>Current inventory levels</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ReactECharts option={getInventoryTrendOption()} style={{ height: "300px" }} />
+                    <ChartPlaceholder title="Stock Levels by Product" />
                   </CardContent>
                 </Card>
               </div>
@@ -388,48 +307,49 @@ export default function SamplesPage() {
 
                   <div className="space-y-4">
                     {filteredSamples.map((sample, index) => (
-                      <motion.div
+                      <div
                         key={sample.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                        className="flex flex-col lg:flex-row lg:items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors gap-4"
                       >
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4 flex-shrink-0">
                           <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
                             <Package className="h-6 w-6 text-primary" />
                           </div>
-                          <div>
-                            <h3 className="font-medium">{sample.name}</h3>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-medium truncate">{sample.name}</h3>
                             <p className="text-sm text-muted-foreground">SKU: {sample.sku}</p>
                             <p className="text-sm text-muted-foreground">{sample.category}</p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                          <div className="text-right">
-                            <p className="text-sm font-medium">{sample.available} available</p>
-                            <p className="text-xs text-muted-foreground">of {sample.quantity}</p>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 lg:gap-6 w-full lg:w-auto">
+                          <div className="flex justify-between sm:justify-start sm:gap-6 lg:gap-4 flex-1">
+                            <div className="text-left sm:text-right">
+                              <p className="text-sm font-medium">{sample.available} available</p>
+                              <p className="text-xs text-muted-foreground">of {sample.quantity}</p>
+                            </div>
+                            <div className="flex items-center">
+                              {getStatusBadge(sample.status)}
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-medium">Last Updated</p>
+                              <p className="text-xs text-muted-foreground">{sample.lastUpdated}</p>
+                            </div>
                           </div>
-                          {getStatusBadge(sample.status)}
-                          <div className="text-right">
-                            <p className="text-sm font-medium">Last Updated</p>
-                            <p className="text-xs text-muted-foreground">{sample.lastUpdated}</p>
-                          </div>
-                        </div>
 
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <div className="flex gap-2 justify-end lg:justify-start">
+                            <Button size="sm" variant="outline">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button size="sm" variant="outline">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 </CardContent>
@@ -445,45 +365,44 @@ export default function SamplesPage() {
                 <CardContent>
                   <div className="space-y-4">
                     {inventoryTransactions.map((item, index) => (
-                      <motion.div
+                      <div
                         key={item.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="flex items-center justify-between p-4 border rounded-lg"
+                        className="flex flex-col lg:flex-row lg:items-center justify-between p-4 border rounded-lg gap-4"
                       >
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4 flex-shrink-0">
                           <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                             <Truck className="h-5 w-5 text-primary" />
                           </div>
-                          <div>
-                            <h3 className="font-medium">{item.reference}</h3>
-                            <p className="text-sm text-muted-foreground">{item.description}</p>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-medium truncate">{item.reference}</h3>
+                            <p className="text-sm text-muted-foreground line-clamp-2 lg:line-clamp-1">{item.description}</p>
                             <p className="text-xs text-muted-foreground">Item ID: {item.itemId}</p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                          <div className="text-right">
-                            <p className="text-sm font-medium">Qty: {item.quantity}</p>
-                            <p className="text-xs text-muted-foreground">{item.date}</p>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 lg:gap-6 w-full lg:w-auto">
+                          <div className="flex justify-between sm:justify-start sm:gap-6 lg:gap-4 items-center">
+                            <div className="text-left sm:text-right">
+                              <p className="text-sm font-medium">Qty: {item.quantity}</p>
+                              <p className="text-xs text-muted-foreground">{item.date}</p>
+                            </div>
+                            <Badge
+                              className={
+                                item.status === "completed"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }
+                            >
+                              {item.status === "completed" ? (
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                              ) : (
+                                <Clock className="h-3 w-3 mr-1" />
+                              )}
+                              {item.status}
+                            </Badge>
                           </div>
-                          <Badge
-                            className={
-                              item.status === "completed"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-yellow-100 text-yellow-800"
-                            }
-                          >
-                            {item.status === "completed" ? (
-                              <CheckCircle className="h-3 w-3 mr-1" />
-                            ) : (
-                              <Clock className="h-3 w-3 mr-1" />
-                            )}
-                            {item.status}
-                          </Badge>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 </CardContent>
@@ -498,7 +417,7 @@ export default function SamplesPage() {
                     <CardDescription>Inventory value distribution</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ReactECharts option={getStockValueChartOption()} style={{ height: "300px" }} />
+                    <ChartPlaceholder title="Stock Value by Product" />
                   </CardContent>
                 </Card>
 
@@ -546,8 +465,7 @@ export default function SamplesPage() {
               </div>
             </TabsContent>
           </Tabs>
-                    </NoSSR>
-          </div>
+      </div>
     </MainLayout>
   )
-} 
+}

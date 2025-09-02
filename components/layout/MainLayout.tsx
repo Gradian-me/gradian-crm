@@ -16,7 +16,7 @@ interface MainLayoutProps {
 export function MainLayout({ 
   children, 
   headerTitle = "Dashboard",
-  headerSubtitle = "Welcome back, John",
+  headerSubtitle = "Welcome back, Mahyar",
   showOnlineBadge = true,
   showScheduleButton = true,
   customHeaderActions
@@ -35,7 +35,7 @@ export function MainLayout({
             showScheduleButton={showScheduleButton}
             customActions={customHeaderActions}
           />
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-auto p-2 lg:p-4">
             {children}
           </main>
         </SidebarInset>

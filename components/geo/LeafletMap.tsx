@@ -15,6 +15,19 @@ const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), { 
 const Polyline = dynamic(() => import("react-leaflet").then((mod) => mod.Polyline), { ssr: false })
 const Circle = dynamic(() => import("react-leaflet").then((mod) => mod.Circle), { ssr: false })
 
+// Fix Leaflet default icon issue in Next.js
+const initializeLeafletIcons = () => {
+  if (typeof window !== 'undefined' && window.L) {
+    // Fix the default icons path issue
+    delete (window.L.Icon.Default.prototype as any)._getIconUrl
+    window.L.Icon.Default.mergeOptions({
+      iconRetinaUrl: '/marker-icon.png',
+      iconUrl: '/marker-icon.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    })
+  }
+}
+
 interface Visit {
   id: number
   hcp: string
@@ -70,74 +83,36 @@ export default function LeafletMap({
   // Debug logging
   console.log('LeafletMap render:', { currentLocation, visits: visits.length, isTracking })
 
-  // Configure custom marker icon
+  // Initialize Leaflet icons when component mounts
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.L) {
-      // Set custom marker icon using mergeOptions
-      window.L.Icon.Default.mergeOptions({
-        iconUrl: '/media/marker-icon-2x.png',
-        iconRetinaUrl: '/media/marker-icon-2x.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowUrl: null,
-        shadowSize: null,
-        shadowAnchor: null
-      })
-    }
-  }, [])
-
-  // Check if Leaflet is available
-  useEffect(() => {
-    const checkLeafletAvailability = () => {
+    const setupLeafletIcons = () => {
       if (typeof window !== 'undefined') {
-        if (!window.L) {
-          console.warn('Leaflet is not loaded yet, waiting...')
-        } else {
-          console.log('Leaflet is available')
+        // Wait for Leaflet to be available
+        const checkLeaflet = () => {
+          if (window.L) {
+            console.log('Leaflet is available, initializing icons...')
+            initializeLeafletIcons()
+            return true
+          }
+          return false
+        }
+        
+        // Try immediately
+        if (!checkLeaflet()) {
+          // If not available, retry with intervals
+          const interval = setInterval(() => {
+            if (checkLeaflet()) {
+              clearInterval(interval)
+            }
+          }, 100)
+          
+          // Clear interval after 5 seconds to prevent infinite checking
+          setTimeout(() => clearInterval(interval), 5000)
         }
       }
     }
     
-    // Check immediately
-    checkLeafletAvailability()
-    
-    // Check again after a delay to allow for dynamic loading
-    const timer = setTimeout(checkLeafletAvailability, 1000)
-    return () => clearTimeout(timer)
-  }, [])
-  
-  // Check if Leaflet CSS is loaded
-  useEffect(() => {
-    const checkLeafletCSS = () => {
-      try {
-        const leafletStyles = document.querySelector('link[href*="leaflet"]')
-        if (!leafletStyles) {
-          console.warn('Leaflet CSS not found, using imported CSS')
-        } else {
-          console.log('Leaflet CSS found:', leafletStyles)
-        }
-        
-        // Check if Leaflet CSS is actually loaded
-        const testElement = document.createElement('div')
-        testElement.className = 'leaflet-container'
-        document.body.appendChild(testElement)
-        
-        const computedStyle = window.getComputedStyle(testElement)
-        const hasLeafletStyles = computedStyle.position === 'relative' || computedStyle.position === 'absolute'
-        
-        console.log('Leaflet CSS loaded:', hasLeafletStyles)
-        console.log('Test element styles:', computedStyle.position)
-        
-        document.body.removeChild(testElement)
-      } catch (error) {
-        console.warn('Error checking Leaflet CSS:', error)
-      }
-    }
-    
-    // Check after a short delay
-    const timer = setTimeout(checkLeafletCSS, 2000)
-    return () => clearTimeout(timer)
+    setupLeafletIcons()
   }, [])
 
   // Generate route coordinates for visualization
@@ -186,27 +161,6 @@ export default function LeafletMap({
     
     return () => clearTimeout(timeout)
   }, [isMapLoaded])
-
-  // Debug effect to check map container rendering
-  useEffect(() => {
-    const checkMapContainer = () => {
-      try {
-        const mapElement = document.querySelector('.leaflet-container')
-        if (mapElement) {
-          console.log('Leaflet container found:', mapElement)
-          console.log('Container dimensions:', mapElement.getBoundingClientRect())
-        } else {
-          console.log('Leaflet container not found yet')
-        }
-      } catch (error) {
-        console.warn('Error checking map container:', error)
-      }
-    }
-    
-    // Check after a short delay to allow for rendering
-    const timer = setTimeout(checkMapContainer, 1000)
-    return () => clearTimeout(timer)
-  }, [])
 
   return (
     <div className="space-y-6">
@@ -276,6 +230,7 @@ export default function LeafletMap({
               className="h-full w-full"
               whenReady={() => {
                 console.log('Map is ready')
+                initializeLeafletIcons() // Ensure icons are initialized when map is ready
                 setIsMapLoaded(true)
               }}
             >

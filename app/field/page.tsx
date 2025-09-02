@@ -177,7 +177,7 @@ export default function FieldTracking() {
       headerTitle="Field Tracking"
       headerSubtitle="GPS tracking and visit management"
     >
-      <div className="p-6">
+      <div className="p-2 md:p-4 lg:p-6">
         <div className="space-y-6">
           {/* Tracking Controls */}
           <div className="flex justify-end">

@@ -240,7 +240,7 @@ export default function ContractManagement() {
       headerTitle="Contract Management"
       headerSubtitle="Manage contracts, compliance, and regulatory documentation"
     >
-      <div className="p-6">
+      <div className="p-2 md:p-4 lg:p-6">
         <div className="space-y-6">
           {/* New Contract Button */}
           <div className="flex justify-end">
