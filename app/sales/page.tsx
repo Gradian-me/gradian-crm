@@ -42,7 +42,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+
 import { hcpList, HCP } from "@/lib/hcp-list"
 
 const funnelStages = [
@@ -78,7 +78,7 @@ const generateOpportunities = (): Opportunity[] => {
   const opportunities: Opportunity[] = []
   const stages = ["awareness", "education", "proposal", "tender", "compliance", "won", "lost"]
   
-  hcpList.forEach((hcp, index) => {
+  hcpList.forEach((hcp) => {
     // Generate 1-2 opportunities per HCP based on their engagement score
     const numOpportunities = hcp.engagementScore && hcp.engagementScore > 80 ? 2 : 1
     
@@ -603,7 +603,7 @@ export default function SalesFunnel() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {funnelStages.slice(0, -2).map((stage, index) => {
+                        {funnelStages.slice(0, -2).map((stage) => {
                           const stageCount = opportunities.filter(opp => opp.stage === stage.id).length
                           const totalActive = opportunities.filter(opp => !["won", "lost"].includes(opp.stage)).length
                           const conversionRate = totalActive > 0 ? Math.round((stageCount / totalActive) * 100) : 0

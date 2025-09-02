@@ -11,7 +11,6 @@ import {
   Mail,
   Building,
   User,
-  Calendar,
   FileText,
   ChevronRight,
   Stethoscope,
@@ -24,7 +23,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Dialog,
@@ -39,7 +37,7 @@ import { Progress } from "@/components/ui/progress"
 import { MainLayout } from "@/components/layout/MainLayout"
 import FormBuilder from "@/components/form-builder"
 import { hcpFormSchema } from "@/lib/form-schemas"
-import { hcpList, HCP, getSpecialties, getRegions, getFacilityTypes } from "@/lib/hcp-list"
+import { hcpList, HCP, getSpecialties, getRegions } from "@/lib/hcp-list"
 
 const specialtyIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   Cardiology: Heart,

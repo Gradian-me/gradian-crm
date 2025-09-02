@@ -1,6 +1,6 @@
 {
   "name": "gradian-crm",
-  "version": "0.19.02",
+  "version": "0.19.03",
   "private": true,
   "scripts": {
     "dev": "next dev",
