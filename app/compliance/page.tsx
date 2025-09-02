@@ -274,7 +274,7 @@ export default function CompliancePage() {
         </Button>
       }
     >
-      <div className="p-6">
+      <div className="p-2 md:p-4 lg:p-6">
         <NoSSR>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">

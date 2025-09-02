@@ -43,15 +43,16 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { hcpList, HCP } from "@/lib/hcp-list"
 
 const funnelStages = [
-  { id: "awareness", name: "Awareness", color: "bg-gray-100 text-gray-800", count: 12 },
-  { id: "education", name: "Education", color: "bg-blue-100 text-blue-800", count: 8 },
-  { id: "proposal", name: "Proposal", color: "bg-yellow-100 text-yellow-800", count: 5 },
-  { id: "tender", name: "Tender", color: "bg-purple-100 text-purple-800", count: 3 },
-  { id: "compliance", name: "Compliance Review", color: "bg-orange-100 text-orange-800", count: 2 },
-  { id: "won", name: "Won", color: "bg-green-100 text-green-800", count: 4 },
-  { id: "lost", name: "Lost", color: "bg-red-100 text-red-800", count: 1 },
+  { id: "awareness", name: "Awareness", color: "bg-gray-100 text-gray-800", count: 0 },
+  { id: "education", name: "Education", color: "bg-blue-100 text-blue-800", count: 0 },
+  { id: "proposal", name: "Proposal", color: "bg-yellow-100 text-yellow-800", count: 0 },
+  { id: "tender", name: "Tender", color: "bg-purple-100 text-purple-800", count: 0 },
+  { id: "compliance", name: "Compliance Review", color: "bg-orange-100 text-orange-800", count: 0 },
+  { id: "won", name: "Won", color: "bg-green-100 text-green-800", count: 0 },
+  { id: "lost", name: "Lost", color: "bg-red-100 text-red-800", count: 0 },
 ]
 
 type Opportunity = {
@@ -69,98 +70,99 @@ type Opportunity = {
   documents: string[]
   notes: string
   stakeholders: string[]
+  hcp: HCP // Add reference to HCP data
 }
 
-const mockOpportunities: Opportunity[] = [
-  {
-    id: 1,
-    title: "Regional Hospital Network - CardioStent Pro",
-    organization: "Metro Health System",
-    value: 500000,
-    stage: "tender",
-    probability: 75,
-    closeDate: "2024-03-15",
-    lastActivity: "2024-01-20",
-    source: "Hospital Tender",
-    contact: "Dr. Sarah Johnson",
-    products: ["CardioStent Pro", "HeartGuard Plus"],
-    documents: ["RFP_Metro_Health.pdf", "Proposal_CardioStent.pdf"],
-    notes: "Strong interest in bulk pricing. Compliance review in progress.",
-    stakeholders: ["Dr. Johnson", "Procurement Manager", "CFO"],
-  },
-  {
-    id: 2,
-    title: "Cancer Center - OncoTarget Trial",
-    organization: "Memorial Cancer Institute",
-    value: 750000,
-    stage: "proposal",
-    probability: 60,
-    closeDate: "2024-04-01",
-    lastActivity: "2024-01-18",
-    source: "Clinical Trial",
-    contact: "Dr. Michael Chen",
-    products: ["OncoTarget", "ImmunoPlex"],
-    documents: ["Clinical_Protocol.pdf", "Budget_Proposal.pdf"],
-    notes: "Awaiting IRB approval. Strong clinical data presentation scheduled.",
-    stakeholders: ["Dr. Chen", "Research Director", "Clinical Coordinator"],
-  },
-  {
-    id: 3,
-    title: "Respiratory Clinic - BreathEasy Rollout",
-    organization: "Pulmonary Care Associates",
-    value: 250000,
-    stage: "education",
-    probability: 40,
-    closeDate: "2024-05-15",
-    lastActivity: "2024-01-15",
-    source: "Conference",
-    contact: "Dr. Emily Rodriguez",
-    products: ["BreathEasy Inhaler", "PulmoMax"],
-    documents: ["Product_Brochure.pdf"],
-    notes: "Initial interest shown at respiratory conference. Follow-up scheduled.",
-    stakeholders: ["Dr. Rodriguez", "Practice Manager"],
-  },
-  {
-    id: 4,
-    title: "Distributor Partnership - Northeast Region",
-    organization: "MedSupply Distributors",
-    value: 1200000,
-    stage: "compliance",
-    probability: 85,
-    closeDate: "2024-02-28",
-    lastActivity: "2024-01-22",
-    source: "Distributor",
-    contact: "James Wilson",
-    products: ["Multiple Product Lines"],
-    documents: ["Distribution_Agreement.pdf", "Compliance_Checklist.pdf"],
-    notes: "Final compliance review. Contract terms agreed upon.",
-    stakeholders: ["James Wilson", "Legal Team", "Regional Manager"],
-  },
-  {
-    id: 5,
-    title: "University Hospital - Research Grant",
-    organization: "State University Medical Center",
-    value: 300000,
-    stage: "won",
-    probability: 100,
-    closeDate: "2024-01-10",
-    lastActivity: "2024-01-10",
-    source: "Clinical Trial",
-    contact: "Dr. Lisa Park",
-    products: ["Research Devices"],
-    documents: ["Grant_Award.pdf", "Research_Agreement.pdf"],
-    notes: "Grant awarded. Implementation phase starting.",
-    stakeholders: ["Dr. Park", "Grant Administrator", "Research Team"],
-  },
-]
+// Generate opportunities based on HCP data
+const generateOpportunities = (): Opportunity[] => {
+  const opportunities: Opportunity[] = []
+  const stages = ["awareness", "education", "proposal", "tender", "compliance", "won", "lost"]
+  
+  hcpList.forEach((hcp, index) => {
+    // Generate 1-2 opportunities per HCP based on their engagement score
+    const numOpportunities = hcp.engagementScore && hcp.engagementScore > 80 ? 2 : 1
+    
+    for (let i = 0; i < numOpportunities; i++) {
+      const stageIndex = Math.floor((hcp.engagementScore || 50) / 15) // Distribute based on engagement
+      const stage = stages[Math.min(stageIndex, stages.length - 1)]
+      
+      // Base value on facility type and prescribing potential
+      let baseValue = 100000
+      if (hcp.facilityType === "Private") baseValue *= 1.5
+      if (hcp.prescribingPotential === "Very High") baseValue *= 2
+      else if (hcp.prescribingPotential === "High") baseValue *= 1.5
+      else if (hcp.prescribingPotential === "Medium") baseValue *= 1.2
+      
+      // Add some variation
+      const variation = (Math.random() * 0.6 + 0.7) // 0.7 to 1.3 multiplier
+      const value = Math.round(baseValue * variation)
+      
+      // Set probability based on stage and engagement score
+      let probability = 30
+      if (stage === "won") probability = 100
+      else if (stage === "compliance") probability = 85
+      else if (stage === "tender") probability = 70
+      else if (stage === "proposal") probability = 60
+      else if (stage === "education") probability = 40
+      else if (stage === "awareness") probability = 25
+      else if (stage === "lost") probability = 0
+      
+      // Adjust probability based on engagement score
+      if (hcp.engagementScore) {
+        probability = Math.min(95, probability + (hcp.engagementScore - 75) / 2)
+      }
+      
+      // Generate close date (next 3-6 months)
+      const futureDate = new Date()
+      futureDate.setMonth(futureDate.getMonth() + Math.floor(Math.random() * 4) + 3)
+      
+      // Generate last activity date (within last 30 days)
+      const lastActivityDate = new Date()
+      lastActivityDate.setDate(lastActivityDate.getDate() - Math.floor(Math.random() * 30))
+      
+      const opportunity: Opportunity = {
+        id: opportunities.length + 1,
+        title: `${hcp.institution} - ${hcp.productInterest?.[0] || hcp.specialty || 'Medical Equipment'} Initiative`,
+        organization: hcp.institution,
+        value: value,
+        stage: stage,
+        probability: Math.max(0, Math.min(100, probability)),
+        closeDate: futureDate.toISOString().split('T')[0],
+        lastActivity: lastActivityDate.toISOString().split('T')[0],
+        source: hcp.type === "hospital" ? "Hospital Tender" : hcp.type === "distributor" ? "Distributor" : "Clinical Trial",
+        contact: hcp.name,
+        products: hcp.productInterest || [hcp.specialty || "General Medical Equipment"],
+        documents: [
+          `${hcp.institution.replace(/\s+/g, '_')}_RFP.pdf`,
+          `Proposal_${hcp.productInterest?.[0]?.replace(/\s+/g, '_') || 'Equipment'}.pdf`
+        ],
+        notes: hcp.notes || `${hcp.prescribingPotential || 'Medium'} potential opportunity. ${hcp.complianceStatus === 'Compliant' ? 'Compliant facility.' : 'Compliance review required.'}`,
+        stakeholders: [hcp.name, "Procurement Manager", "Medical Director"],
+        hcp: hcp
+      }
+      
+      opportunities.push(opportunity)
+    }
+  })
+  
+  return opportunities
+}
 
+const opportunities = generateOpportunities()
+
+// Update funnel stage counts
+funnelStages.forEach(stage => {
+  stage.count = opportunities.filter(opp => opp.stage === stage.id).length
+})
+
+// Calculate pipeline stats from real data
 const pipelineStats = {
-  totalValue: 3000000,
-  weightedValue: 1875000,
-  averageDealSize: 600000,
-  conversionRate: 68,
-  averageCycleTime: 120,
-  activeOpportunities: 28,
+  totalValue: opportunities.reduce((sum, opp) => sum + opp.value, 0),
+  weightedValue: opportunities.reduce((sum, opp) => sum + (opp.value * opp.probability / 100), 0),
+  averageDealSize: opportunities.length > 0 ? Math.round(opportunities.reduce((sum, opp) => sum + opp.value, 0) / opportunities.length) : 0,
+  conversionRate: opportunities.length > 0 ? Math.round((opportunities.filter(opp => opp.stage === "won").length / opportunities.length) * 100) : 0,
+  averageCycleTime: 120, // Keep this as estimated
+  activeOpportunities: opportunities.filter(opp => !["won", "lost"].includes(opp.stage)).length,
 }
 
 export default function SalesFunnel() {
@@ -169,10 +171,12 @@ export default function SalesFunnel() {
   const [searchTerm, setSearchTerm] = useState<string>("")
   const [selectedStage, setSelectedStage] = useState<string>("all")
 
-  const filteredOpportunities = mockOpportunities.filter((opp: Opportunity) => {
+  const filteredOpportunities = opportunities.filter((opp: Opportunity) => {
     const matchesSearch =
       opp.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      opp.organization.toLowerCase().includes(searchTerm.toLowerCase())
+      opp.organization.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      opp.contact.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      opp.hcp.region.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStage = selectedStage === "all" || opp.stage === selectedStage
     return matchesSearch && matchesStage
   })
@@ -201,9 +205,9 @@ export default function SalesFunnel() {
   return (
     <MainLayout 
       headerTitle="Sales Funnel & Tenders"
-      headerSubtitle="Manage your sales pipeline and tender opportunities"
+      headerSubtitle="Manage your sales pipeline and tender opportunities based on HCP data"
     >
-      <div className="p-6">
+      <div className="p-2 md:p-4 lg:p-6">
         <div className="space-y-6">
           {/* New Opportunity Button */}
           <div className="flex justify-end">
@@ -236,14 +240,14 @@ export default function SalesFunnel() {
           {/* Pipeline Stats */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-              <Card>
+              <Card className="card-important">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Pipeline</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-white">Total Pipeline</CardTitle>
+                  <DollarSign className="h-4 w-4 text-white/80" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{formatCurrency(pipelineStats.totalValue)}</div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-2xl font-bold text-white">{formatCurrency(pipelineStats.totalValue)}</div>
+                  <div className="text-xs text-white/70">
                     Weighted: {formatCurrency(pipelineStats.weightedValue)}
                   </div>
                 </CardContent>
@@ -251,14 +255,14 @@ export default function SalesFunnel() {
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-              <Card>
+              <Card className="card-featured">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Opportunities</CardTitle>
-                  <Target className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-white">Active Opportunities</CardTitle>
+                  <Target className="h-4 w-4 text-white/80" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{pipelineStats.activeOpportunities}</div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-2xl font-bold text-white">{pipelineStats.activeOpportunities}</div>
+                  <div className="text-xs text-white/70">
                     Avg: {formatCurrency(pipelineStats.averageDealSize)}
                   </div>
                 </CardContent>
@@ -273,7 +277,7 @@ export default function SalesFunnel() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{pipelineStats.conversionRate}%</div>
-                  <div className="text-xs text-green-600">+5% from last quarter</div>
+                  <div className="text-xs text-green-600">Based on HCP engagement</div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -309,12 +313,12 @@ export default function SalesFunnel() {
                       <TrendingUp className="h-5 w-5" />
                       Sales Funnel
                     </CardTitle>
-                    <CardDescription>Visual representation of your sales pipeline</CardDescription>
+                    <CardDescription>Visual representation of your sales pipeline based on HCP data</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       {funnelStages.map((stage, index) => {
-                        const stageOpportunities = mockOpportunities.filter((opp) => opp.stage === stage.id)
+                        const stageOpportunities = opportunities.filter((opp) => opp.stage === stage.id)
                         const stageValue = stageOpportunities.reduce((sum, opp) => sum + opp.value, 0)
                         const maxWidth = 100 - index * 12 // Funnel shape
 
@@ -351,6 +355,7 @@ export default function SalesFunnel() {
                                       <span className="text-xs text-muted-foreground">{formatCurrency(opp.value)}</span>
                                     </div>
                                     <div className="text-xs text-muted-foreground">{opp.organization}</div>
+                                    <div className="text-xs text-blue-600">{opp.hcp.region}</div>
                                   </div>
                                 ))}
                                 {stageOpportunities.length > 2 && (
@@ -383,7 +388,7 @@ export default function SalesFunnel() {
                         <div className="relative">
                           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                           <Input
-                            placeholder="Search opportunities..."
+                            placeholder="Search opportunities, organizations, regions..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-10"
@@ -433,6 +438,9 @@ export default function SalesFunnel() {
                                 <Badge className={getStageColor(opportunity.stage)}>
                                   {funnelStages.find((s) => s.id === opportunity.stage)?.name}
                                 </Badge>
+                                <Badge variant="outline" className="text-xs">
+                                  {opportunity.hcp.facilityType}
+                                </Badge>
                               </div>
 
                               <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -450,6 +458,15 @@ export default function SalesFunnel() {
                                 </div>
                               </div>
 
+                              <div className="flex items-center gap-4 text-sm">
+                                <span className="text-muted-foreground">Region: </span>
+                                <span className="font-medium text-blue-600">{opportunity.hcp.region}</span>
+                                <span className="text-muted-foreground">Type: </span>
+                                <span className="font-medium">{opportunity.hcp.type}</span>
+                                <span className="text-muted-foreground">Specialty: </span>
+                                <span className="font-medium">{opportunity.hcp.specialty}</span>
+                              </div>
+
                               <div className="flex items-center gap-4">
                                 <div className="text-sm">
                                   <span className="text-muted-foreground">Value: </span>
@@ -464,6 +481,10 @@ export default function SalesFunnel() {
                                 <div className="text-sm">
                                   <span className="text-muted-foreground">Source: </span>
                                   <span className="font-medium">{opportunity.source}</span>
+                                </div>
+                                <div className="text-sm">
+                                  <span className="text-muted-foreground">Engagement: </span>
+                                  <span className="font-medium text-green-600">{opportunity.hcp.engagementScore}/100</span>
                                 </div>
                               </div>
 
@@ -500,11 +521,11 @@ export default function SalesFunnel() {
                         <Briefcase className="h-5 w-5" />
                         Active Tenders
                       </CardTitle>
-                      <CardDescription>Current tender opportunities and bids</CardDescription>
+                      <CardDescription>Current tender opportunities and bids from HCP partners</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {mockOpportunities
+                        {opportunities
                           .filter((opp) => opp.stage === "tender" || opp.stage === "compliance")
                           .map((tender) => (
                             <div key={tender.id} className="p-3 border border-border rounded-lg">
@@ -515,6 +536,7 @@ export default function SalesFunnel() {
                                 </Badge>
                               </div>
                               <p className="text-sm text-muted-foreground mb-2">{tender.organization}</p>
+                              <p className="text-xs text-blue-600 mb-2">{tender.hcp.region} • {tender.hcp.facilityType}</p>
                               <div className="flex items-center justify-between text-sm">
                                 <span>Value: {formatCurrency(tender.value)}</span>
                                 <span>Due: {tender.closeDate}</span>
@@ -542,35 +564,25 @@ export default function SalesFunnel() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between p-2 border border-border rounded">
-                          <div className="flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">RFP_Metro_Health.pdf</span>
-                          </div>
-                          <div className="flex gap-1">
-                            <Button size="sm" variant="ghost">
-                              <Download className="h-3 w-3" />
-                            </Button>
-                            <Button size="sm" variant="ghost">
-                              <Eye className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between p-2 border border-border rounded">
-                          <div className="flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">Proposal_CardioStent.pdf</span>
-                          </div>
-                          <div className="flex gap-1">
-                            <Button size="sm" variant="ghost">
-                              <Download className="h-3 w-3" />
-                            </Button>
-                            <Button size="sm" variant="ghost">
-                              <Eye className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
+                        {opportunities
+                          .filter(opp => opp.stage === "tender" || opp.stage === "compliance")
+                          .slice(0, 5)
+                          .map((opp) => opp.documents.map((doc, index) => (
+                            <div key={`${opp.id}-${index}`} className="flex items-center justify-between p-2 border border-border rounded">
+                              <div className="flex items-center gap-2">
+                                <FileText className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm">{doc}</span>
+                              </div>
+                              <div className="flex gap-1">
+                                <Button size="sm" variant="ghost">
+                                  <Download className="h-3 w-3" />
+                                </Button>
+                                <Button size="sm" variant="ghost">
+                                  <Eye className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))).flat()}
 
                         <Button className="w-full bg-transparent" variant="outline">
                           <Upload className="h-4 w-4 mr-2" />
@@ -587,12 +599,14 @@ export default function SalesFunnel() {
                   <Card>
                     <CardHeader>
                       <CardTitle>Pipeline Performance</CardTitle>
-                      <CardDescription>Conversion rates by stage</CardDescription>
+                      <CardDescription>Conversion rates by stage based on HCP data</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
                         {funnelStages.slice(0, -2).map((stage, index) => {
-                          const conversionRate = Math.max(20, 90 - index * 15)
+                          const stageCount = opportunities.filter(opp => opp.stage === stage.id).length
+                          const totalActive = opportunities.filter(opp => !["won", "lost"].includes(opp.stage)).length
+                          const conversionRate = totalActive > 0 ? Math.round((stageCount / totalActive) * 100) : 0
                           return (
                             <div key={stage.id} className="space-y-2">
                               <div className="flex items-center justify-between text-sm">
@@ -609,33 +623,35 @@ export default function SalesFunnel() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>Source Performance</CardTitle>
-                      <CardDescription>Lead sources and conversion</CardDescription>
+                      <CardTitle>Regional Performance</CardTitle>
+                      <CardDescription>Opportunities by region and facility type</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {[
-                          { source: "Hospital Tenders", count: 12, value: 2400000, conversion: 75 },
-                          { source: "Clinical Trials", count: 8, value: 1800000, conversion: 68 },
-                          { source: "Conferences", count: 6, value: 900000, conversion: 45 },
-                          { source: "Distributors", count: 4, value: 1200000, conversion: 85 },
-                        ].map((item) => (
-                          <div
-                            key={item.source}
-                            className="flex items-center justify-between p-3 border border-border rounded-lg"
-                          >
-                            <div>
-                              <p className="font-medium">{item.source}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {item.count} opportunities • {formatCurrency(item.value)}
-                              </p>
+                        {[...new Set(hcpList.map(hcp => hcp.region))].map((region) => {
+                          const regionOpps = opportunities.filter(opp => opp.hcp.region === region)
+                          const regionValue = regionOpps.reduce((sum, opp) => sum + opp.value, 0)
+                          const publicCount = regionOpps.filter(opp => opp.hcp.facilityType === "Public").length
+                          const privateCount = regionOpps.filter(opp => opp.hcp.facilityType === "Private").length
+                          
+                          return (
+                            <div
+                              key={region}
+                              className="flex items-center justify-between p-3 border border-border rounded-lg"
+                            >
+                              <div>
+                                <p className="font-medium">{region}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {regionOpps.length} opportunities • Public: {publicCount} | Private: {privateCount}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-medium text-green-600">{formatCurrency(regionValue)}</p>
+                                <p className="text-xs text-muted-foreground">total value</p>
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <p className="font-medium text-green-600">{item.conversion}%</p>
-                              <p className="text-xs text-muted-foreground">conversion</p>
-                            </div>
-                          </div>
-                        ))}
+                          )
+                        })}
                       </div>
                     </CardContent>
                   </Card>
@@ -654,14 +670,14 @@ export default function SalesFunnel() {
                     {selectedOpportunity.title}
                   </DialogTitle>
                   <DialogDescription>
-                    {selectedOpportunity.organization} • {formatCurrency(selectedOpportunity.value)}
+                    {selectedOpportunity.organization} • {formatCurrency(selectedOpportunity.value)} • {selectedOpportunity.hcp.region}
                   </DialogDescription>
                 </DialogHeader>
 
                 <Tabs defaultValue="details" className="mt-6">
                   <TabsList className="grid w-full grid-cols-4">
                     <TabsTrigger value="details">Details</TabsTrigger>
-                    <TabsTrigger value="stakeholders">Stakeholders</TabsTrigger>
+                    <TabsTrigger value="hcp">HCP Profile</TabsTrigger>
                     <TabsTrigger value="documents">Documents</TabsTrigger>
                     <TabsTrigger value="activity">Activity</TabsTrigger>
                   </TabsList>
@@ -709,6 +725,10 @@ export default function SalesFunnel() {
                           <label className="text-sm font-medium">Last Activity</label>
                           <div className="mt-1">{selectedOpportunity.lastActivity}</div>
                         </div>
+                        <div>
+                          <label className="text-sm font-medium">Engagement Score</label>
+                          <div className="mt-1 text-lg font-semibold text-green-600">{selectedOpportunity.hcp.engagementScore}/100</div>
+                        </div>
                       </div>
                     </div>
                     <div>
@@ -717,29 +737,61 @@ export default function SalesFunnel() {
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="stakeholders" className="space-y-4">
-                    <div className="space-y-3">
-                      {selectedOpportunity.stakeholders.map((stakeholder: string, index: number) => (
-                        <div key={index} className="flex items-center gap-3 p-3 border border-border rounded-lg">
-                          <Avatar>
-                            <AvatarFallback>
-                              {stakeholder
-                                .split(" ")
-                                .map((n: string) => n[0])
-                                .join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <p className="font-medium">{stakeholder}</p>
-                            <p className="text-sm text-muted-foreground">Key Decision Maker</p>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button size="sm" variant="outline">
-                              Contact
-                            </Button>
+                  <TabsContent value="hcp" className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-sm font-medium">Institution</label>
+                          <div className="mt-1 font-semibold">{selectedOpportunity.hcp.institution}</div>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Region</label>
+                          <div className="mt-1">{selectedOpportunity.hcp.region}</div>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Facility Type</label>
+                          <div className="mt-1">
+                            <Badge variant="outline">{selectedOpportunity.hcp.facilityType}</Badge>
                           </div>
                         </div>
-                      ))}
+                        <div>
+                          <label className="text-sm font-medium">Type</label>
+                          <div className="mt-1 capitalize">{selectedOpportunity.hcp.type}</div>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Specialty</label>
+                          <div className="mt-1">{selectedOpportunity.hcp.specialty}</div>
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-sm font-medium">Contact Information</label>
+                          <div className="mt-1 space-y-1">
+                            <div className="text-sm">{selectedOpportunity.hcp.email}</div>
+                            <div className="text-sm">{selectedOpportunity.hcp.telephone}</div>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Address</label>
+                          <div className="mt-1 text-sm">{selectedOpportunity.hcp.address}</div>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Prescribing Potential</label>
+                          <div className="mt-1">
+                            <Badge variant={selectedOpportunity.hcp.prescribingPotential === "Very High" ? "default" : "secondary"}>
+                              {selectedOpportunity.hcp.prescribingPotential}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Compliance Status</label>
+                          <div className="mt-1">
+                            <Badge variant={selectedOpportunity.hcp.complianceStatus === "Compliant" ? "default" : "destructive"}>
+                              {selectedOpportunity.hcp.complianceStatus}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </TabsContent>
 
@@ -771,20 +823,20 @@ export default function SalesFunnel() {
                     <div className="space-y-3">
                       <div className="p-3 border border-border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">Proposal Submitted</span>
-                          <span className="text-sm text-muted-foreground">2024-01-20</span>
+                          <span className="font-medium">Last Visit</span>
+                          <span className="text-sm text-muted-foreground">{selectedOpportunity.hcp.lastVisit}</span>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Comprehensive proposal submitted including technical specifications and pricing.
+                          {selectedOpportunity.hcp.purpose || "Regular follow-up visit completed"}
                         </p>
                       </div>
                       <div className="p-3 border border-border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">Meeting Scheduled</span>
-                          <span className="text-sm text-muted-foreground">2024-01-18</span>
+                          <span className="font-medium">Next Scheduled Visit</span>
+                          <span className="text-sm text-muted-foreground">{selectedOpportunity.hcp.nextVisit}</span>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Follow-up meeting scheduled with procurement team for next week.
+                          Follow-up meeting scheduled to discuss {selectedOpportunity.products[0]}.
                         </p>
                       </div>
                     </div>

@@ -38,6 +38,16 @@
   --sidebar-accent-foreground: oklch(1 0 0); /* White sidebar accent text */
   --sidebar-border: oklch(0.92 0 0); /* Light gray sidebar border */
   --sidebar-ring: oklch(0.65 0.15 280 / 0.5); /* Purple sidebar focus ring */
+  
+  /* Inspirational gradient colors */
+  --violet-primary: oklch(0.6 0.2 280);
+  --violet-secondary: oklch(0.7 0.15 290);
+  --purple-primary: oklch(0.55 0.18 270);
+  --purple-secondary: oklch(0.65 0.12 260);
+  --gradient-violet: linear-gradient(135deg, oklch(0.6 0.2 280), oklch(0.7 0.15 290));
+  --gradient-purple: linear-gradient(135deg, oklch(0.55 0.18 270), oklch(0.65 0.12 260));
+  --gradient-mixed: linear-gradient(135deg, oklch(0.6 0.2 280), oklch(0.55 0.18 270), oklch(0.7 0.15 290));
+  --gradient-subtle: linear-gradient(135deg, oklch(0.98 0.02 280), oklch(0.99 0.01 270));
 }
 
 .dark {
@@ -73,6 +83,16 @@
   --sidebar-accent-foreground: oklch(0.98 0 0); /* Light sidebar accent text */
   --sidebar-border: oklch(0.3 0 0); /* Medium gray sidebar border */
   --sidebar-ring: oklch(0.5 0 0); /* Medium gray sidebar focus ring */
+  
+  /* Dark mode gradient colors */
+  --violet-primary: oklch(0.7 0.18 280);
+  --violet-secondary: oklch(0.8 0.12 290);
+  --purple-primary: oklch(0.65 0.16 270);
+  --purple-secondary: oklch(0.75 0.1 260);
+  --gradient-violet: linear-gradient(135deg, oklch(0.7 0.18 280), oklch(0.8 0.12 290));
+  --gradient-purple: linear-gradient(135deg, oklch(0.65 0.16 270), oklch(0.75 0.1 260));
+  --gradient-mixed: linear-gradient(135deg, oklch(0.7 0.18 280), oklch(0.65 0.16 270), oklch(0.8 0.12 290));
+  --gradient-subtle: linear-gradient(135deg, oklch(0.2 0.02 280), oklch(0.22 0.01 270));
 }
 
 @theme inline {
@@ -122,5 +142,162 @@
   }
   body {
     @apply bg-background text-foreground;
+    background: linear-gradient(to bottom right, oklch(1 0 0), oklch(0.99 0.005 280));
+  }
+  
+  /* Global cursor pointer for interactive elements */
+  button,
+  [role="button"],
+  [data-state="active"],
+  [data-state="inactive"],
+  .cursor-pointer {
+    @apply cursor-pointer;
+  }
+  
+  /* Tab triggers and interactive tab elements */
+  [role="tab"],
+  [role="tablist"] > *,
+  [data-radix-collection-item] {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  /* Inspirational gradient utilities */
+  .gradient-violet {
+    background: var(--gradient-violet);
+    color: white;
+  }
+  
+  .gradient-purple {
+    background: var(--gradient-purple);
+    color: white;
+  }
+  
+  .gradient-mixed {
+    background: var(--gradient-mixed);
+    color: white;
+  }
+  
+  .gradient-subtle {
+    background: var(--gradient-subtle);
+  }
+  
+  /* Enhanced important card styles */
+  .card-important {
+    background: var(--gradient-violet);
+    color: white;
+    border: none;
+    box-shadow: 0 10px 30px oklch(0.6 0.2 280 / 0.2), 0 4px 12px oklch(0.6 0.2 280 / 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .card-important:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px oklch(0.6 0.2 280 / 0.25), 0 6px 15px oklch(0.6 0.2 280 / 0.15);
+  }
+  
+  .card-featured {
+    background: var(--gradient-purple);
+    color: white;
+    border: none;
+    box-shadow: 0 8px 25px oklch(0.55 0.18 270 / 0.2), 0 3px 10px oklch(0.55 0.18 270 / 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .card-featured:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px oklch(0.55 0.18 270 / 0.25), 0 5px 12px oklch(0.55 0.18 270 / 0.15);
+  }
+  
+  .card-highlight {
+    background: var(--gradient-mixed);
+    color: white;
+    border: none;
+    box-shadow: 0 6px 20px oklch(0.6 0.2 280 / 0.15), 0 2px 8px oklch(0.6 0.2 280 / 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .card-highlight:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 30px oklch(0.6 0.2 280 / 0.2), 0 4px 12px oklch(0.6 0.2 280 / 0.15);
+  }
+  
+  .card-minimal {
+    background: white;
+    border: 1px solid oklch(0.95 0 0);
+    box-shadow: 0 1px 3px oklch(0 0 0 / 0.05);
+    transition: all 0.2s ease;
+  }
+  
+  .card-minimal:hover {
+    border-color: oklch(0.65 0.15 280 / 0.3);
+    box-shadow: 0 4px 12px oklch(0.65 0.15 280 / 0.1);
+  }
+  
+  /* Glassmorphism effect for special cards */
+  .card-glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px oklch(0.6 0.2 280 / 0.1);
+  }
+  
+  /* Minimal button enhancements */
+  .btn-minimal {
+    background: transparent;
+    border: 1px solid oklch(0.9 0 0);
+    color: oklch(0.4 0 0);
+    transition: all 0.2s ease;
+  }
+  
+  .btn-minimal:hover {
+    background: var(--gradient-subtle);
+    border-color: oklch(0.65 0.15 280 / 0.5);
+    color: oklch(0.25 0 0);
+  }
+  
+  .btn-gradient {
+    background: var(--gradient-violet);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-gradient:hover {
+    background: var(--gradient-mixed);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px oklch(0.6 0.2 280 / 0.25);
+  }
+  
+  /* Text gradients */
+  .text-gradient {
+    background: var(--gradient-violet);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 600;
+  }
+  
+  /* Animated gradients */
+  .gradient-animated {
+    background: linear-gradient(45deg, oklch(0.6 0.2 280), oklch(0.55 0.18 270), oklch(0.7 0.15 290), oklch(0.65 0.12 260));
+    background-size: 400% 400%;
+    animation: gradientShift 6s ease infinite;
+  }
+  
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  /* Enhanced shadows */
+  .shadow-violet {
+    box-shadow: 0 10px 30px oklch(0.6 0.2 280 / 0.2);
+  }
+  
+  .shadow-purple {
+    box-shadow: 0 10px 30px oklch(0.55 0.18 270 / 0.2);
   }
 }

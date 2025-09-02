@@ -85,7 +85,7 @@ export default function DevicesPage() {
         </div>
       }
     >
-      <div className="p-6">
+      <div className="p-2 md:p-4 lg:p-6">
         <div className="space-y-6">
           {/* Page Header */}
           <div className="text-center">

@@ -1,9 +1,9 @@
 {
   "name": "gradian-crm",
-  "version": "0.17.00",
+  "version": "0.19.02",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

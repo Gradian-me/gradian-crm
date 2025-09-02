@@ -286,9 +286,9 @@ export default function Dashboard() {
   return (
     <MainLayout 
       headerTitle="Dashboard"
-      headerSubtitle="Welcome back, John"
+      headerSubtitle="Welcome back, Mahyar"
     >
-      <div className="p-6">
+      <div className="p-2 md:p-4 lg:p-6">
         <NoSSR>
           <Tabs key={activeTab} value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                 <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
@@ -300,7 +300,7 @@ export default function Dashboard() {
                 <TabsContent value="overview" className="space-y-6">
                   {/* KPI Cards */}
                   <KPIGrid
-                    metrics={kpiData.map((kpi) => ({
+                    metrics={kpiData.map((kpi, index) => ({
                       title: kpi.title,
                       value: kpi.value,
                       change: kpi.change,
@@ -308,12 +308,13 @@ export default function Dashboard() {
                       period: "from last month",
                       icon: kpi.icon,
                       description: kpi.description,
+                      variant: index === 0 ? "gradient" : index === 2 ? "purple" : "default",
                     }))}
                   />
 
                   {/* Enhanced Analytics Charts - Row 1 */}
                   <div className="grid gap-6 lg:grid-cols-2">
-                    <Card>
+                    <Card className="card-minimal">
                       <CardHeader>
                         <CardTitle>Sales Performance Trends</CardTitle>
                         <CardDescription>Monthly revenue and field visit correlation</CardDescription>
@@ -323,7 +324,7 @@ export default function Dashboard() {
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="card-minimal">
                       <CardHeader>
                         <CardTitle>HCP Engagement Analysis</CardTitle>
                         <CardDescription>Engagement rates by medical specialty</CardDescription>
@@ -336,7 +337,7 @@ export default function Dashboard() {
 
                   {/* Enhanced Analytics Charts - Row 2 */}
                   <div className="grid gap-6 lg:grid-cols-2">
-                    <Card>
+                    <Card className="card-minimal">
                       <CardHeader>
                         <CardTitle>Sample Distribution Overview</CardTitle>
                         <CardDescription>Quarterly sample distribution and inventory status</CardDescription>
@@ -346,7 +347,7 @@ export default function Dashboard() {
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="card-minimal">
                       <CardHeader>
                         <CardTitle>Compliance Score Progression</CardTitle>
                         <CardDescription>Monthly compliance score trends with area fill</CardDescription>
@@ -359,7 +360,7 @@ export default function Dashboard() {
 
                   {/* Territory Performance and Quick Actions */}
                   <div className="grid gap-6 lg:grid-cols-3">
-                    <Card className="lg:col-span-2">
+                    <Card className="lg:col-span-2 card-minimal">
                       <CardHeader>
                         <CardTitle>Territory Performance Overview</CardTitle>
                         <CardDescription>Coverage and performance metrics by region</CardDescription>
@@ -369,25 +370,25 @@ export default function Dashboard() {
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="card-glass">
                       <CardHeader>
-                        <CardTitle>Quick Actions</CardTitle>
+                        <CardTitle className="text-gradient">Quick Actions</CardTitle>
                         <CardDescription>Common tasks and shortcuts</CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-3">
-                        <Button className="w-full justify-start bg-transparent" variant="outline">
+                        <Button className="w-full justify-start btn-gradient hover:btn-gradient">
                           <Users className="h-4 w-4 mr-2" />
                           Add New HCP
                         </Button>
-                        <Button className="w-full justify-start bg-transparent" variant="outline">
+                        <Button className="w-full justify-start btn-minimal">
                           <MapPin className="h-4 w-4 mr-2" />
                           Plan Route
                         </Button>
-                        <Button className="w-full justify-start bg-transparent" variant="outline">
+                        <Button className="w-full justify-start btn-minimal">
                           <Package className="h-4 w-4 mr-2" />
                           Log Sample
                         </Button>
-                        <Button className="w-full justify-start bg-transparent" variant="outline">
+                        <Button className="w-full justify-start btn-minimal">
                           <FileText className="h-4 w-4 mr-2" />
                           Create Report
                         </Button>
@@ -405,6 +406,7 @@ export default function Dashboard() {
                         trend: "up",
                         period: "from last month",
                         icon: TrendingUp,
+                        variant: "featured",
                       },
                       {
                         title: "Avg. Deal Size",
@@ -413,6 +415,7 @@ export default function Dashboard() {
                         trend: "up",
                         period: "from last month",
                         icon: DollarSign,
+                        variant: "default",
                       },
                       {
                         title: "Sales Cycle",
@@ -421,6 +424,7 @@ export default function Dashboard() {
                         trend: "down" as const,
                         period: "from last month",
                         icon: Calendar,
+                        variant: "default",
                       },
                       {
                         title: "Customer Satisfaction",
@@ -429,16 +433,17 @@ export default function Dashboard() {
                         trend: "up",
                         period: "from last month",
                         icon: Award,
+                        variant: "purple",
                       },
                     ]}
                   />
                 </TabsContent>
 
                 <TabsContent value="activity" className="space-y-6">
-                  <Card>
+                  <Card className="card-featured">
                     <CardHeader>
-                      <CardTitle>Recent Activity</CardTitle>
-                      <CardDescription>Your latest actions and system updates</CardDescription>
+                      <CardTitle className="text-white">Recent Activity</CardTitle>
+                      <CardDescription className="text-white/80">Your latest actions and system updates</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
@@ -448,21 +453,21 @@ export default function Dashboard() {
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.1 }}
-                            className="flex items-start gap-4 p-3 rounded-lg border border-border"
+                            className="flex items-start gap-4 p-3 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30"
                           >
                             <div
                               className={`h-2 w-2 rounded-full mt-2 ${
                                 activity.status === "completed"
-                                  ? "bg-green-500"
+                                  ? "bg-green-400"
                                   : activity.status === "pending"
-                                    ? "bg-yellow-500"
-                                    : "bg-red-500"
+                                    ? "bg-yellow-400"
+                                    : "bg-red-400"
                               }`}
                             />
                             <div className="flex-1 space-y-1">
-                              <p className="text-sm font-medium">{activity.title}</p>
-                              <p className="text-xs text-muted-foreground">{activity.description}</p>
-                              <p className="text-xs text-muted-foreground">{activity.time}</p>
+                              <p className="text-sm font-medium text-white">{activity.title}</p>
+                              <p className="text-xs text-white/70">{activity.description}</p>
+                              <p className="text-xs text-white/60">{activity.time}</p>
                             </div>
                           </motion.div>
                         ))}
@@ -473,58 +478,58 @@ export default function Dashboard() {
 
                 <TabsContent value="insights" className="space-y-6">
                   <div className="grid gap-6 lg:grid-cols-2">
-                    <Card>
+                    <Card className="card-important">
                       <CardHeader>
-                        <CardTitle>Performance Insights</CardTitle>
-                        <CardDescription>Key metrics and trends analysis</CardDescription>
+                        <CardTitle className="text-white">Performance Insights</CardTitle>
+                        <CardDescription className="text-white/80">Key metrics and trends analysis</CardDescription>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-4">
-                          <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
-                            <TrendingUp className="h-4 w-4 text-green-600" />
+                          <div className="flex items-center gap-2 p-3 bg-white/20 backdrop-blur-sm rounded-lg border border-white/30">
+                            <TrendingUp className="h-4 w-4 text-green-300" />
                             <div>
-                              <p className="text-sm font-medium text-green-800">Visit efficiency up 15%</p>
-                              <p className="text-xs text-green-600">Compared to last quarter</p>
+                              <p className="text-sm font-medium text-white">Visit efficiency up 15%</p>
+                              <p className="text-xs text-white/70">Compared to last quarter</p>
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
-                            <Users className="h-4 w-4 text-blue-600" />
+                          <div className="flex items-center gap-2 p-3 bg-white/20 backdrop-blur-sm rounded-lg border border-white/30">
+                            <Users className="h-4 w-4 text-blue-300" />
                             <div>
-                              <p className="text-sm font-medium text-blue-800">New HCP relationships: 23</p>
-                              <p className="text-xs text-blue-600">This month</p>
+                              <p className="text-sm font-medium text-white">New HCP relationships: 23</p>
+                              <p className="text-xs text-white/70">This month</p>
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2 p-3 bg-yellow-50 rounded-lg">
-                            <AlertCircle className="h-4 w-4 text-yellow-600" />
+                          <div className="flex items-center gap-2 p-3 bg-white/20 backdrop-blur-sm rounded-lg border border-white/30">
+                            <AlertCircle className="h-4 w-4 text-yellow-300" />
                             <div>
-                              <p className="text-sm font-medium text-yellow-800">3 compliance items need attention</p>
-                              <p className="text-xs text-yellow-600">Review required</p>
+                              <p className="text-sm font-medium text-white">3 compliance items need attention</p>
+                              <p className="text-xs text-white/70">Review required</p>
                             </div>
                           </div>
                         </div>
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="card-glass">
                       <CardHeader>
-                        <CardTitle>Recommendations</CardTitle>
+                        <CardTitle className="text-gradient">Recommendations</CardTitle>
                         <CardDescription>AI-powered suggestions for optimization</CardDescription>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-3">
-                          <div className="p-3 border border-border rounded-lg">
+                          <div className="p-3 border border-violet-200/50 rounded-lg bg-gradient-subtle">
                             <p className="text-sm font-medium">Focus on Cardiology</p>
                             <p className="text-xs text-muted-foreground">High engagement rates in this specialty</p>
                           </div>
 
-                          <div className="p-3 border border-border rounded-lg">
+                          <div className="p-3 border border-violet-200/50 rounded-lg bg-gradient-subtle">
                             <p className="text-sm font-medium">Schedule follow-ups</p>
                             <p className="text-xs text-muted-foreground">5 HCPs haven&apos;t been visited in 30+ days</p>
                           </div>
 
-                          <div className="p-3 border border-border rounded-lg">
+                          <div className="p-3 border border-violet-200/50 rounded-lg bg-gradient-subtle">
                             <p className="text-sm font-medium">Sample optimization</p>
                             <p className="text-xs text-muted-foreground">Reduce waste by 12% with better planning</p>
                           </div>
