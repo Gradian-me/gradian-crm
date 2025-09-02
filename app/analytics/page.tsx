@@ -6,15 +6,12 @@ import {
   TrendingUp,
   Users,
   MapPin,
-  DollarSign,
   Calendar,
   Target,
   Download,
   Filter,
   Eye,
   ExternalLink,
-  Building,
-  Stethoscope,
   Activity,
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -26,7 +23,7 @@ import { NoSSR } from "@/components/ui/no-ssr"
 import dynamic from "next/dynamic"
 import { applyChartTheme, chartTheme } from "@/lib/chart-theme"
 import { KPIGrid } from "@/components/analytics"
-import { hcpList, getRegions, getSpecialties, getHCPsByRegion, getHCPsByType, getHCPsByFacilityType } from "@/lib/hcp-list"
+import { hcpList, getRegions, getSpecialties, getHCPsByRegion, getHCPsByFacilityType } from "@/lib/hcp-list"
 
 // Dynamically import ECharts to avoid SSR issues
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false })
@@ -136,7 +133,7 @@ export default function AnalyticsPage() {
       },
       tooltip: {
         trigger: "axis",
-        formatter: function (params: any) {
+        formatter: function (params: { name: string; value: number }[]) {
           return `${params[0].name}<br/>Revenue: $${params[0].value}K`;
         },
       },
@@ -195,7 +192,7 @@ export default function AnalyticsPage() {
           type: "bar",
           data: regionCoverage.map(item => item.value),
           itemStyle: {
-            color: function(params: any) {
+            color: function(params: { value: number }) {
               const value = params.value
               if (value >= 90) return "#059669"
               if (value >= 80) return "#0891b2"
@@ -256,7 +253,7 @@ export default function AnalyticsPage() {
       },
       tooltip: {
         trigger: "item",
-        formatter: function(params: any) {
+        formatter: function(params: { name: string; value: number }) {
           const stage = params.name;
           const value = params.value;
           const percentage = Math.round((value / totalHCPs) * 100);
@@ -291,7 +288,7 @@ export default function AnalyticsPage() {
             fontSize: 14,
             fontWeight: "bold",
             color: "#ffffff",
-            formatter: function(params: any) {
+            formatter: function(params: { name: string; value: number }) {
               return `${params.name}\n${params.value}`;
             },
           },
@@ -334,9 +331,9 @@ export default function AnalyticsPage() {
   const getTrendAnalysisOption = () => {
     const monthlyData = {
       months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-      samples: analytics.regions.map((_, i) => analytics.totalSamples / 6 + Math.random() * 10),
-      visits: analytics.regions.map((_, i) => analytics.completedVisits / 6 + Math.random() * 5),
-      engagement: analytics.regions.map((_, i) => analytics.avgEngagementScore + Math.random() * 10),
+      samples: Array.from({ length: 6 }, () => analytics.totalSamples / 6 + Math.random() * 10),
+      visits: Array.from({ length: 6 }, () => analytics.completedVisits / 6 + Math.random() * 5),
+      engagement: Array.from({ length: 6 }, () => analytics.avgEngagementScore + Math.random() * 10),
     }
 
     return applyChartTheme({

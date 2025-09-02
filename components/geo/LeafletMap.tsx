@@ -19,7 +19,7 @@ const Circle = dynamic(() => import("react-leaflet").then((mod) => mod.Circle), 
 const initializeLeafletIcons = () => {
   if (typeof window !== 'undefined' && window.L) {
     // Fix the default icons path issue
-    delete (window.L.Icon.Default.prototype as any)._getIconUrl
+    delete (window.L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl
     window.L.Icon.Default.mergeOptions({
       iconRetinaUrl: '/marker-icon.png',
       iconUrl: '/marker-icon.png',

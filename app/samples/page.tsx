@@ -306,7 +306,7 @@ export default function SamplesPage() {
                   </div>
 
                   <div className="space-y-4">
-                    {filteredSamples.map((sample, index) => (
+                    {filteredSamples.map((sample) => (
                       <div
                         key={sample.id}
                         className="flex flex-col lg:flex-row lg:items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors gap-4"
@@ -364,7 +364,7 @@ export default function SamplesPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {inventoryTransactions.map((item, index) => (
+                    {inventoryTransactions.map((item) => (
                       <div
                         key={item.id}
                         className="flex flex-col lg:flex-row lg:items-center justify-between p-4 border rounded-lg gap-4"
