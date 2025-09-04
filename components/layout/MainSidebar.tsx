@@ -14,6 +14,7 @@ import {
   Warehouse,
   UserCheck,
   TabletSmartphone,
+  Beaker,
 } from "lucide-react"
 import {
   SidebarContent,
@@ -31,6 +32,7 @@ const sidebarItems = [
   { icon: MapPin, label: "Field Tracking", href: "/field" },
   { icon: TrendingUp, label: "Sales Funnel", href: "/sales" },
   { icon: FileText, label: "Contracts", href: "/contracts" },
+  { icon: Beaker, label: "Project Justification", href: "/project-justification" },
   { icon: Stethoscope, label: "Medical Devices", href: "/devices" },
   { icon: Warehouse, label: "Inventory Management", href: "/inventory" },
   { icon: Package, label: "Samples", href: "/samples" },
