@@ -34,7 +34,7 @@ export function MainHeader({
   }, [])
 
   return (
-    <header className={`sticky top-0 z-50 flex min-h-16 flex-col sm:flex-row items-start sm:items-center border-b border-border bg-gradient-subtle backdrop-blur supports-[backdrop-filter]:bg-gradient-subtle/90 transition-all duration-200 px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-0 ${
+    <header className={`sticky top-0 z-50 flex min-h-16 flex-col sm:flex-row items-start sm:items-center border-b border-border bg-background backdrop-blur supports-[backdrop-filter]:bg-background/95 transition-all duration-200 px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-0 ${
       isScrolled ? 'shadow-lg shadow-violet-100/50' : 'shadow-sm shadow-violet-50/50'
     }`}>
       <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 min-w-0 flex-1 w-full sm:w-auto">
@@ -50,8 +50,7 @@ export function MainHeader({
         {showOnlineBadge && (
           <Badge variant="outline" className="gap-1 text-xs sm:text-sm whitespace-nowrap px-2 py-1 flex-shrink-0 min-w-fit border-green-300/50 bg-green-100/80 text-green-700 shadow-sm">
             <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="hidden xs:inline sm:inline">Online</span>
-            <span className="xs:hidden sm:hidden">●</span>
+            <span>Online</span>
           </Badge>
         )}
         {showScheduleButton && (

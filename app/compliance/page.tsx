@@ -329,7 +329,7 @@ export default function CompliancePage() {
                     <CardDescription>Distribution of compliance items by status</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ReactECharts option={getComplianceStatusOption()} style={{ height: "300px" }} />
+                    <ReactECharts option={getComplianceStatusOption()} style={{ height: "100%" }} className="h-[250px] sm:h-[300px] lg:h-[350px] min-h-[200px]" />
                   </CardContent>
                 </Card>
 
@@ -339,7 +339,7 @@ export default function CompliancePage() {
                     <CardDescription>Risk levels across different compliance areas</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ReactECharts option={getRiskAssessmentOption()} style={{ height: "300px" }} />
+                    <ReactECharts option={getRiskAssessmentOption()} style={{ height: "100%" }} className="h-[250px] sm:h-[300px] lg:h-[350px] min-h-[200px]" />
                   </CardContent>
                 </Card>
               </div>
@@ -514,9 +514,9 @@ export default function CompliancePage() {
                     <CardTitle>Compliance Trends</CardTitle>
                     <CardDescription>Monthly compliance score progression</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <ReactECharts option={getComplianceTrendOption()} style={{ height: "300px" }} />
-                  </CardContent>
+                                        <CardContent>
+                        <ReactECharts option={getComplianceTrendOption()} style={{ height: "100%" }} className="h-[250px] sm:h-[300px] lg:h-[350px] min-h-[200px]" />
+                      </CardContent>
                 </Card>
 
                 <Card>

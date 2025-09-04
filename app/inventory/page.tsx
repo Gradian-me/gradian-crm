@@ -376,7 +376,7 @@ export default function InventoryPage() {
                     <CardDescription>Stock quantities by category</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ReactECharts option={getInventoryChartOption()} style={{ height: "250px" }} className="min-h-[200px]" />
+                                            <ReactECharts option={getInventoryChartOption()} style={{ height: "100%" }} className="h-[250px] sm:h-[300px] lg:h-[350px] min-h-[200px]" />
                   </CardContent>
                 </Card>
 
@@ -386,7 +386,7 @@ export default function InventoryPage() {
                     <CardDescription>Available vs reserved quantities</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ReactECharts option={getInventoryTrendOption()} style={{ height: "250px" }} className="min-h-[200px]" />
+                                            <ReactECharts option={getInventoryTrendOption()} style={{ height: "100%" }} className="h-[250px] sm:h-[300px] lg:h-[350px] min-h-[200px]" />
                   </CardContent>
                 </Card>
               </div>
@@ -398,7 +398,7 @@ export default function InventoryPage() {
                   <CardDescription>Total value by product</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ReactECharts option={getStockValueChartOption()} style={{ height: "250px" }} className="min-h-[200px]" />
+                                          <ReactECharts option={getStockValueChartOption()} style={{ height: "100%" }} className="h-[250px] sm:h-[300px] lg:h-[350px] min-h-[200px]" />
                 </CardContent>
               </Card>
             </TabsContent>

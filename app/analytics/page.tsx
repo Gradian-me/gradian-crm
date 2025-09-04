@@ -450,7 +450,7 @@ export default function AnalyticsPage() {
                     <CardDescription>Quarterly revenue trends</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ReactECharts option={getRevenueChartOption()} style={{ height: "250px" }} className="min-h-[200px]" />
+                    <ReactECharts option={getRevenueChartOption()} style={{ height: "100%" }} className="h-[250px] sm:h-[300px] lg:h-[350px] min-h-[200px]" />
                   </CardContent>
                 </Card>
 
@@ -460,7 +460,7 @@ export default function AnalyticsPage() {
                     <CardDescription>Engagement rates by specialty</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ReactECharts option={getHCPEngagementOption()} style={{ height: "250px" }} className="min-h-[200px]" />
+                    <ReactECharts option={getHCPEngagementOption()} style={{ height: "100%" }} className="h-[250px] sm:h-[300px] lg:h-[350px] min-h-[200px]" />
                   </CardContent>
                 </Card>
               </div>
@@ -533,7 +533,7 @@ export default function AnalyticsPage() {
                     <CardDescription>Conversion rates through sales stages</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ReactECharts option={getSalesFunnelOption()} style={{ height: "350px" }} className="min-h-[300px]" />
+                    <ReactECharts option={getSalesFunnelOption()} style={{ height: "100%" }} className="h-[300px] sm:h-[350px] lg:h-[400px] min-h-[250px]" />
                   </CardContent>
                 </Card>
 
@@ -543,7 +543,7 @@ export default function AnalyticsPage() {
                     <CardDescription>Monthly performance indicators</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ReactECharts option={getTrendAnalysisOption()} style={{ height: "350px" }} className="min-h-[300px]" />
+                    <ReactECharts option={getTrendAnalysisOption()} style={{ height: "100%" }} className="h-[300px] sm:h-[350px] lg:h-[400px] min-h-[250px]" />
                   </CardContent>
                 </Card>
               </div>
@@ -623,7 +623,7 @@ export default function AnalyticsPage() {
                   <CardDescription>Regional engagement analysis and coverage metrics</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ReactECharts option={getTerritoryMapOption()} style={{ height: "350px" }} className="min-h-[300px]" />
+                  <ReactECharts option={getTerritoryMapOption()} style={{ height: "100%" }} className="h-[300px] sm:h-[350px] lg:h-[400px] min-h-[250px]" />
                 </CardContent>
               </Card>
 

@@ -13,6 +13,7 @@ import {
   Stethoscope,
   Warehouse,
   UserCheck,
+  TabletSmartphone,
 } from "lucide-react"
 import {
   SidebarContent,
@@ -35,6 +36,7 @@ const sidebarItems = [
   { icon: Package, label: "Samples", href: "/samples" },
   { icon: Shield, label: "Compliance", href: "/compliance" },
   { icon: Activity, label: "Analytics", href: "/analytics" },
+  { icon: TabletSmartphone, label: "Scrollable Tabs Demo", href: "/scrollable-tabs-demo" },
 ]
 
 export function MainSidebar() {
