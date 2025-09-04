@@ -46,13 +46,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { hcpList, HCP } from "@/lib/hcp-list"
 
 const funnelStages = [
-  { id: "awareness", name: "Awareness", color: "bg-gray-100 text-gray-800", count: 0 },
-  { id: "education", name: "Education", color: "bg-blue-100 text-blue-800", count: 0 },
-  { id: "proposal", name: "Proposal", color: "bg-yellow-100 text-yellow-800", count: 0 },
-  { id: "tender", name: "Tender", color: "bg-purple-100 text-purple-800", count: 0 },
-  { id: "compliance", name: "Compliance Review", color: "bg-orange-100 text-orange-800", count: 0 },
-  { id: "won", name: "Won", color: "bg-green-100 text-green-800", count: 0 },
-  { id: "lost", name: "Lost", color: "bg-red-100 text-red-800", count: 0 },
+  { id: "awareness", name: "Awareness", color: "bg-slate-100 text-slate-800 border-slate-300", iconColor: "text-slate-600", count: 0 },
+  { id: "education", name: "Education", color: "bg-blue-100 text-blue-800 border-blue-300", iconColor: "text-blue-600", count: 0 },
+  { id: "proposal", name: "Proposal", color: "bg-amber-100 text-amber-800 border-amber-300", iconColor: "text-amber-600", count: 0 },
+  { id: "tender", name: "Tender", color: "bg-purple-100 text-purple-800 border-purple-300", iconColor: "text-purple-600", count: 0 },
+  { id: "compliance", name: "Compliance Review", color: "bg-orange-100 text-orange-800 border-orange-300", iconColor: "text-orange-600", count: 0 },
+  { id: "won", name: "Won", color: "bg-green-100 text-green-800 border-green-300", iconColor: "text-green-600", count: 0 },
+  { id: "lost", name: "Lost", color: "bg-red-100 text-red-800 border-red-300", iconColor: "text-red-600", count: 0 },
 ]
 
 type Opportunity = {
@@ -78,20 +78,64 @@ const generateOpportunities = (): Opportunity[] => {
   const opportunities: Opportunity[] = []
   const stages = ["awareness", "education", "proposal", "tender", "compliance", "won", "lost"]
   
-  hcpList.forEach((hcp) => {
-    // Generate 1-2 opportunities per HCP based on their engagement score
-    const numOpportunities = hcp.engagementScore && hcp.engagementScore > 80 ? 2 : 1
+  hcpList.forEach((hcp, hcpIndex) => {
+    // Ensure better distribution across all stages
+    // Generate 1-3 opportunities per HCP based on their engagement score and size
+    let numOpportunities = 1
+    if (hcp.engagementScore && hcp.engagementScore > 85) numOpportunities = 3
+    else if (hcp.engagementScore && hcp.engagementScore > 75) numOpportunities = 2
     
     for (let i = 0; i < numOpportunities; i++) {
-      const stageIndex = Math.floor((hcp.engagementScore || 50) / 15) // Distribute based on engagement
-      const stage = stages[Math.min(stageIndex, stages.length - 1)]
+      // Better stage distribution algorithm
+      let stageIndex: number
+      const random = Math.random()
+      const engagementFactor = (hcp.engagementScore || 50) / 100
+      
+      // Distribute opportunities more evenly across stages
+      if (i === 0) {
+        // First opportunity: distribute based on HCP index for even spread
+        stageIndex = (hcpIndex + i) % stages.length
+      } else {
+        // Additional opportunities: weight towards middle stages
+        if (random < 0.15) stageIndex = 0 // awareness
+        else if (random < 0.25) stageIndex = 1 // education  
+        else if (random < 0.45) stageIndex = 2 // proposal
+        else if (random < 0.65) stageIndex = 3 // tender
+        else if (random < 0.80) stageIndex = 4 // compliance
+        else if (random < 0.90) stageIndex = 5 // won
+        else stageIndex = 6 // lost
+        
+        // Adjust based on engagement score
+        if (engagementFactor > 0.8 && stageIndex < 4) {
+          stageIndex = Math.min(stageIndex + 1, 5) // Push towards won
+        } else if (engagementFactor < 0.6 && stageIndex > 2) {
+          stageIndex = Math.max(stageIndex - 1, 0) // Pull towards early stages
+        }
+      }
+      
+      const stage = stages[stageIndex]
       
       // Base value on facility type and prescribing potential
-      let baseValue = 100000
-      if (hcp.facilityType === "Private") baseValue *= 1.5
-      if (hcp.prescribingPotential === "Very High") baseValue *= 2
-      else if (hcp.prescribingPotential === "High") baseValue *= 1.5
-      else if (hcp.prescribingPotential === "Medium") baseValue *= 1.2
+      let baseValue = 50000
+      if (hcp.facilityType === "Private") baseValue *= 1.8
+      if (hcp.prescribingPotential === "Very High") baseValue *= 2.5
+      else if (hcp.prescribingPotential === "High") baseValue *= 1.8
+      else if (hcp.prescribingPotential === "Medium") baseValue *= 1.3
+      
+      // Scale by opportunity number
+      if (i === 1) baseValue *= 0.6
+      if (i === 2) baseValue *= 0.4
+      
+      // Add regional multiplier
+      const regionMultipliers: { [key: string]: number } = {
+        "International Zone, Baghdad": 1.5,
+        "Outside International Zone, Baghdad": 1.3,
+        "Erbil": 1.4,
+        "Basra": 1.2,
+        "Duhok": 1.1,
+        "Sulaymaniyah": 1.2
+      }
+      baseValue *= regionMultipliers[hcp.region] || 1.0
       
       // Add some variation
       const variation = (Math.random() * 0.6 + 0.7) // 0.7 to 1.3 multiplier
@@ -102,42 +146,70 @@ const generateOpportunities = (): Opportunity[] => {
       if (stage === "won") probability = 100
       else if (stage === "compliance") probability = 85
       else if (stage === "tender") probability = 70
-      else if (stage === "proposal") probability = 60
-      else if (stage === "education") probability = 40
-      else if (stage === "awareness") probability = 25
+      else if (stage === "proposal") probability = 55
+      else if (stage === "education") probability = 35
+      else if (stage === "awareness") probability = 20
       else if (stage === "lost") probability = 0
       
       // Adjust probability based on engagement score
       if (hcp.engagementScore) {
-        probability = Math.min(95, probability + (hcp.engagementScore - 75) / 2)
+        const adjustment = (hcp.engagementScore - 75) / 3
+        probability = Math.max(5, Math.min(95, probability + adjustment))
       }
       
-      // Generate close date (next 3-6 months)
+      // Generate close date (next 2-8 months based on stage)
       const futureDate = new Date()
-      futureDate.setMonth(futureDate.getMonth() + Math.floor(Math.random() * 4) + 3)
+      const monthsAhead = stage === "awareness" ? 8 : 
+                         stage === "education" ? 6 :
+                         stage === "proposal" ? 4 :
+                         stage === "tender" ? 3 :
+                         stage === "compliance" ? 2 : 1
+      futureDate.setMonth(futureDate.getMonth() + Math.floor(Math.random() * 2) + monthsAhead)
       
-      // Generate last activity date (within last 30 days)
+      // Generate last activity date (within last 45 days)
       const lastActivityDate = new Date()
-      lastActivityDate.setDate(lastActivityDate.getDate() - Math.floor(Math.random() * 30))
+      lastActivityDate.setDate(lastActivityDate.getDate() - Math.floor(Math.random() * 45))
+      
+      // Generate more specific opportunity titles
+      const productLines = hcp.productInterest || [hcp.specialty || 'Medical Equipment']
+      const opportunityTypes = [
+        "Equipment Upgrade",
+        "Annual Contract Renewal", 
+        "Emergency Procurement",
+        "Research Collaboration",
+        "Technology Integration",
+        "Capacity Expansion"
+      ]
+      
+      const opportunityType = opportunityTypes[i % opportunityTypes.length]
+      const productLine = productLines[0] || hcp.specialty || 'Medical Equipment'
       
       const opportunity: Opportunity = {
         id: opportunities.length + 1,
-        title: `${hcp.institution} - ${hcp.productInterest?.[0] || hcp.specialty || 'Medical Equipment'} Initiative`,
+        title: `${hcp.institution} - ${productLine} ${opportunityType}`,
         organization: hcp.institution,
         value: value,
         stage: stage,
         probability: Math.max(0, Math.min(100, probability)),
         closeDate: futureDate.toISOString().split('T')[0],
         lastActivity: lastActivityDate.toISOString().split('T')[0],
-        source: hcp.type === "hospital" ? "Hospital Tender" : hcp.type === "distributor" ? "Distributor" : "Clinical Trial",
+        source: hcp.type === "hospital" ? "Hospital Tender" : 
+                hcp.type === "distributor" ? "Distributor Partnership" : 
+                hcp.type === "clinic" ? "Clinic Procurement" : "Direct Sales",
         contact: hcp.name,
         products: hcp.productInterest || [hcp.specialty || "General Medical Equipment"],
         documents: [
-          `${hcp.institution.replace(/\s+/g, '_')}_RFP.pdf`,
-          `Proposal_${hcp.productInterest?.[0]?.replace(/\s+/g, '_') || 'Equipment'}.pdf`
+          `${hcp.institution.replace(/\s+/g, '_')}_RFP_${Date.now()}.pdf`,
+          `Proposal_${productLine.replace(/\s+/g, '_')}_v${i+1}.pdf`,
+          `Technical_Specs_${hcp.type}_${Date.now()}.pdf`
         ],
-        notes: hcp.notes || `${hcp.prescribingPotential || 'Medium'} potential opportunity. ${hcp.complianceStatus === 'Compliant' ? 'Compliant facility.' : 'Compliance review required.'}`,
-        stakeholders: [hcp.name, "Procurement Manager", "Medical Director"],
+        notes: `${hcp.prescribingPotential || 'Medium'} potential ${opportunityType.toLowerCase()}. ${hcp.complianceStatus === 'Compliant' ? 'Facility is fully compliant.' : 'Compliance review required before proceeding.'} Last engagement score: ${hcp.engagementScore || 'N/A'}/100.`,
+        stakeholders: [
+          hcp.name, 
+          "Procurement Manager", 
+          "Medical Director",
+          ...(hcp.facilityType === "Private" ? ["CEO", "Finance Director"] : ["Government Liaison", "Tender Committee"])
+        ],
         hcp: hcp
       }
       
@@ -207,8 +279,8 @@ export default function SalesFunnel() {
       headerTitle="Sales Funnel & Tenders"
       headerSubtitle="Manage your sales pipeline and tender opportunities based on HCP data"
     >
-      <div className="p-2 md:p-4 lg:p-6">
-        <div className="space-y-6">
+      <div className="p-1 sm:p-2 md:p-4 lg:p-6">
+                  <div className="space-y-4 sm:space-y-6">
           {/* New Opportunity Button */}
           <div className="flex justify-end">
             <Dialog>
@@ -238,7 +310,7 @@ export default function SalesFunnel() {
           </div>
 
           {/* Pipeline Stats */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
               <Card className="card-important">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -298,83 +370,175 @@ export default function SalesFunnel() {
 
           <NoSSR>
             <Tabs key={activeTab} value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
-                <TabsTrigger value="funnel">Funnel View</TabsTrigger>
-                <TabsTrigger value="list">List View</TabsTrigger>
-                <TabsTrigger value="tenders">Tenders</TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:w-[500px]">
+                <TabsTrigger value="funnel" className="text-xs sm:text-sm">Funnel View</TabsTrigger>
+                <TabsTrigger value="list" className="text-xs sm:text-sm">List View</TabsTrigger>
+                <TabsTrigger value="tenders" className="text-xs sm:text-sm">Tenders</TabsTrigger>
+                <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
               </TabsList>
 
               <TabsContent value="funnel" className="space-y-6">
-                {/* Funnel Visualization */}
-                <Card>
-                  <CardHeader>
+                {/* Enhanced Funnel Visualization */}
+                <Card className="overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
                     <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5" />
-                      Sales Funnel
+                      <TrendingUp className="h-5 w-5 text-blue-600" />
+                      Interactive Sales Funnel
                     </CardTitle>
-                    <CardDescription>Visual representation of your sales pipeline based on HCP data</CardDescription>
+                    <CardDescription>Visual representation of your sales pipeline with HCP data integration</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
+                  <CardContent className="p-3 sm:p-4 lg:p-6">
+                    <div className="space-y-4 sm:space-y-6">
                       {funnelStages.map((stage, index) => {
                         const stageOpportunities = opportunities.filter((opp) => opp.stage === stage.id)
                         const stageValue = stageOpportunities.reduce((sum, opp) => sum + opp.value, 0)
-                        const maxWidth = 100 - index * 12 // Funnel shape
+                        const stageWeightedValue = stageOpportunities.reduce((sum, opp) => sum + (opp.value * opp.probability / 100), 0)
+                        
+                        // Enhanced funnel shape with better proportions for different screen sizes
+                        const mobileWidth = Math.max(85, 100 - index * 5) // Minimal stepping on mobile
+                        const desktopWidth = Math.max(40, 100 - index * 12) // More pronounced stepping on desktop, minimum 40%
+                        const conversionRate = index > 0 ? 
+                          Math.round((stageOpportunities.length / opportunities.filter(opp => funnelStages.findIndex(s => s.id === opp.stage) >= index).length) * 100) || 0 : 100
 
                         return (
                           <motion.div
                             key={stage.id}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
+                            transition={{ delay: index * 0.15 }}
                             className="relative"
                           >
                             <div
-                              className={`p-4 rounded-lg border-2 border-dashed transition-all hover:border-solid ${stage.color.replace("text-", "border-").replace("bg-", "border-").replace("100", "200")}`}
-                              style={{ width: `${maxWidth}%`, margin: "0 auto" }}
+                              className={`relative p-3 sm:p-4 lg:p-6 rounded-xl border-2 transition-all duration-300 hover:shadow-lg hover:border-solid ${stage.color} bg-gradient-to-r from-white to-gray-50/50 shadow-sm funnel-stage-${index}`}
+                              style={{ 
+                                '--mobile-width': `${mobileWidth}%`,
+                                '--desktop-width': `${desktopWidth}%`,
+                                width: `var(--mobile-width)`,
+                                margin: "0 auto",
+                                background: `linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)`
+                              } as React.CSSProperties}
                             >
-                              <div className="flex items-center justify-between mb-2">
-                                <h3 className="font-semibold">{stage.name}</h3>
-                                <Badge className={stage.color}>{stage.count} opportunities</Badge>
-                              </div>
-                              <div className="text-sm text-muted-foreground">
-                                Total Value: {formatCurrency(stageValue)}
-                              </div>
+                                                             {/* Stage Header */}
+                               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+                                 <div className="flex items-center gap-3">
+                                   <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full ${stage.color.split(' ')[0]} ${stage.iconColor} flex items-center justify-center font-bold text-xs sm:text-sm`}>
+                                     {index + 1}
+                                   </div>
+                                   <div>
+                                     <h3 className="font-bold text-base sm:text-lg">{stage.name}</h3>
+                                     <p className="text-xs text-muted-foreground">Stage {index + 1} of {funnelStages.length}</p>
+                                   </div>
+                                 </div>
+                                 <div className="text-left sm:text-right">
+                                                                     <Badge className={`${stage.color} text-xs`} variant="outline">
+                                    {stage.count} opportunities
+                                  </Badge>
+                                   {index > 0 && (
+                                     <div className="text-xs text-muted-foreground mt-1">
+                                       {conversionRate}% conversion
+                                     </div>
+                                   )}
+                                 </div>
+                               </div>
 
-                              {/* Opportunity Cards in Stage */}
-                              <div className="mt-3 space-y-2">
-                                {stageOpportunities.slice(0, 2).map((opp) => (
-                                  <div
-                                    key={opp.id}
-                                    className="p-2 bg-white rounded border cursor-pointer hover:shadow-sm transition-shadow"
-                                    onClick={() => setSelectedOpportunity(opp)}
-                                  >
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-sm font-medium truncate">{opp.title}</span>
-                                      <span className="text-xs text-muted-foreground">{formatCurrency(opp.value)}</span>
-                                    </div>
-                                    <div className="text-xs text-muted-foreground">{opp.organization}</div>
-                                    <div className="text-xs text-blue-600">{opp.hcp.region}</div>
+                                                             {/* Value Metrics */}
+                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                                 <div className="text-center p-3 bg-white/70 rounded-lg">
+                                   <p className="text-xs sm:text-sm text-muted-foreground">Total Value</p>
+                                   <p className="font-bold text-base sm:text-lg">{formatCurrency(stageValue)}</p>
+                                 </div>
+                                 <div className="text-center p-3 bg-white/70 rounded-lg">
+                                   <p className="text-xs sm:text-sm text-muted-foreground">Weighted Value</p>
+                                   <p className="font-bold text-base sm:text-lg">{formatCurrency(stageWeightedValue)}</p>
+                                 </div>
+                               </div>
+
+                                                             {/* Opportunity Preview Cards */}
+                               <div className="space-y-2">
+                                 {stageOpportunities.slice(0, 3).map((opp) => (
+                                   <div
+                                     key={opp.id}
+                                     className="p-2 sm:p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:shadow-md hover:border-blue-300 transition-all duration-200"
+                                     onClick={() => setSelectedOpportunity(opp)}
+                                   >
+                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                       <div className="flex-1 min-w-0">
+                                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                                           <span className="text-xs sm:text-sm font-semibold truncate">{opp.title}</span>
+                                           <Badge variant="outline" className="text-xs w-fit">
+                                             {opp.hcp.facilityType}
+                                           </Badge>
+                                         </div>
+                                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-muted-foreground">
+                                           <span className="flex items-center gap-1">
+                                             <Building className="h-3 w-3 flex-shrink-0" />
+                                             <span className="truncate">{opp.organization}</span>
+                                           </span>
+                                           <span className="text-blue-600 font-medium truncate">{opp.hcp.region}</span>
+                                         </div>
+                                       </div>
+                                       <div className="text-left sm:text-right flex-shrink-0">
+                                         <div className="text-xs sm:text-sm font-bold">{formatCurrency(opp.value)}</div>
+                                         <div className={`text-xs ${getProbabilityColor(opp.probability)}`}>
+                                           {opp.probability.toFixed(2)}% probability
+                                         </div>
+                                       </div>
+                                     </div>
+                                   </div>
+                                 ))}
+                                {stageOpportunities.length > 3 && (
+                                  <div className="text-center p-2 text-sm text-muted-foreground bg-gray-50 rounded-lg">
+                                    +{stageOpportunities.length - 3} more opportunities
                                   </div>
-                                ))}
-                                {stageOpportunities.length > 2 && (
-                                  <div className="text-xs text-center text-muted-foreground">
-                                    +{stageOpportunities.length - 2} more
+                                )}
+                                {stageOpportunities.length === 0 && (
+                                  <div className="text-center p-4 text-sm text-muted-foreground">
+                                    No opportunities in this stage
                                   </div>
                                 )}
                               </div>
                             </div>
 
-                            {index < funnelStages.length - 2 && (
-                              <div className="flex justify-center mt-2">
-                                <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                              </div>
-                            )}
+                                                         {/* Enhanced Flow Arrow */}
+                             {index < funnelStages.length - 2 && (
+                               <div className="flex justify-center my-3 sm:my-4">
+                                 <div className="flex flex-col items-center">
+                                   <ArrowRight className="h-4 w-4 sm:h-6 sm:w-6 text-blue-500" />
+                                   <div className="text-xs text-muted-foreground mt-1 hidden sm:block">
+                                     {stageOpportunities.length > 0 && opportunities.filter(opp => funnelStages.findIndex(s => s.id === opp.stage) === index + 1).length > 0 && (
+                                       `${Math.round((opportunities.filter(opp => funnelStages.findIndex(s => s.id === opp.stage) === index + 1).length / stageOpportunities.length) * 100)}% flow`
+                                     )}
+                                   </div>
+                                 </div>
+                               </div>
+                             )}
                           </motion.div>
                         )
                       })}
                     </div>
+
+                                         {/* Funnel Summary Stats */}
+                     <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl">
+                       <h4 className="font-bold text-base sm:text-lg mb-4 text-center">Funnel Performance Summary</h4>
+                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                         <div className="text-center p-3 bg-white/50 rounded-lg">
+                           <p className="text-lg sm:text-2xl font-bold text-blue-600">{opportunities.length}</p>
+                           <p className="text-xs sm:text-sm text-muted-foreground">Total Opportunities</p>
+                         </div>
+                         <div className="text-center p-3 bg-white/50 rounded-lg">
+                           <p className="text-lg sm:text-2xl font-bold text-green-600">{formatCurrency(pipelineStats.totalValue)}</p>
+                           <p className="text-xs sm:text-sm text-muted-foreground">Pipeline Value</p>
+                         </div>
+                         <div className="text-center p-3 bg-white/50 rounded-lg">
+                           <p className="text-lg sm:text-2xl font-bold text-purple-600">{pipelineStats.conversionRate}%</p>
+                           <p className="text-xs sm:text-sm text-muted-foreground">Win Rate</p>
+                         </div>
+                         <div className="text-center p-3 bg-white/50 rounded-lg">
+                           <p className="text-lg sm:text-2xl font-bold text-orange-600">{formatCurrency(pipelineStats.averageDealSize)}</p>
+                           <p className="text-xs sm:text-sm text-muted-foreground">Avg Deal Size</p>
+                         </div>
+                       </div>
+                     </div>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -474,9 +638,9 @@ export default function SalesFunnel() {
                                 </div>
                                 <div className="text-sm">
                                   <span className="text-muted-foreground">Probability: </span>
-                                  <span className={`font-medium ${getProbabilityColor(opportunity.probability)}`}>
-                                    {opportunity.probability}%
-                                  </span>
+                                                                  <span className={`font-medium ${getProbabilityColor(opportunity.probability)}`}>
+                                  {opportunity.probability.toFixed(2)}%
+                                </span>
                                 </div>
                                 <div className="text-sm">
                                   <span className="text-muted-foreground">Source: </span>
@@ -695,7 +859,7 @@ export default function SalesFunnel() {
                         </div>
                         <div>
                           <label className="text-sm font-medium">Probability</label>
-                          <div className="mt-1 text-lg font-semibold">{selectedOpportunity.probability}%</div>
+                          <div className="mt-1 text-lg font-semibold">{selectedOpportunity.probability.toFixed(2)}%</div>
                         </div>
                         <div>
                           <label className="text-sm font-medium">Close Date</label>

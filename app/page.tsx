@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { motion } from "framer-motion"
 import {
   Users,
@@ -8,66 +8,90 @@ import {
   FileText,
   TrendingUp,
   AlertCircle,
-  Calendar,
   Package,
   Shield,
   DollarSign,
   Award,
+  Target,
+  Activity,
+  Clock,
+  Building,
+  Stethoscope,
+  ChartBar,
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import { MainLayout } from "@/components/layout/MainLayout"
 import { NoSSR } from "@/components/ui/no-ssr"
 import dynamic from "next/dynamic"
 import { applyChartTheme, chartTheme } from "@/lib/chart-theme"
 import { KPIGrid } from "@/components/analytics"
+import { hcpList, getRegions, getHCPsByFacilityType } from "@/lib/hcp-list"
 
 // Dynamically import ECharts to avoid SSR issues
 const ReactECharts = dynamic(() => import("echarts-for-react"), { ssr: false })
 
+// Calculate real-time analytics from HCP data
+const calculateDashboardAnalytics = () => {
+  const totalHCPs = hcpList.length
+  const completedVisits = hcpList.filter(hcp => hcp.status === "completed").length
+  const pendingVisits = hcpList.filter(hcp => hcp.status === "scheduled" || hcp.status === "in-progress").length
+  const avgEngagementScore = Math.round(hcpList.reduce((sum, hcp) => sum + (hcp.engagementScore || 0), 0) / totalHCPs)
+  
+  // Calculate total samples and financial metrics
+  const totalSamples = hcpList.reduce((sum, hcp) => sum + (hcp.sunshineAct?.samples || 0), 0)
+  const totalGifts = hcpList.reduce((sum, hcp) => sum + (hcp.sunshineAct?.gifts || 0), 0)
+  const totalSponsorship = hcpList.reduce((sum, hcp) => sum + (hcp.sunshineAct?.sponsorships || 0), 0)
+  
+  // Calculate estimated pipeline value based on engagement and potential
+  const estimatedPipeline = hcpList.reduce((sum, hcp) => {
+    const baseValue = (hcp.engagementScore || 0) * 1000
+    const potentialMultiplier = hcp.prescribingPotential === 'High' ? 2.5 : 
+                               hcp.prescribingPotential === 'Medium' ? 1.5 : 1
+    return sum + (baseValue * potentialMultiplier)
+  }, 0)
+  
+  // Territory analytics
+  const regions = getRegions()
+  const publicFacilities = getHCPsByFacilityType('Public').length
+  const privateFacilities = getHCPsByFacilityType('Private').length
+  
+  // Calculate compliance metrics
+  const compliantHCPs = hcpList.filter(hcp => hcp.complianceStatus === "Compliant").length
+  const complianceRate = Math.round((compliantHCPs / totalHCPs) * 100)
+  
+  // Calculate conversion rates
+  const highEngagement = hcpList.filter(hcp => (hcp.engagementScore || 0) >= 80).length
+  const conversionRate = Math.round((highEngagement / totalHCPs) * 100)
+  
+  return {
+    totalHCPs,
+    completedVisits,
+    pendingVisits,
+    avgEngagementScore,
+    totalSamples,
+    totalGifts,
+    totalSponsorship,
+    estimatedPipeline,
+    regions: regions.length,
+    publicFacilities,
+    privateFacilities,
+    complianceRate,
+    conversionRate,
+    highEngagement,
+  }
+}
 
-const kpiData = [
-  {
-    title: "Active HCPs",
-    value: "1,247",
-    change: "+12%",
-    trend: "up",
-    icon: Users,
-    description: "Healthcare professionals in your network",
-  },
-  {
-    title: "Field Visits",
-    value: "89",
-    change: "+8%",
-    trend: "up",
-    icon: MapPin,
-    description: "Visits completed this month",
-  },
-  {
-    title: "Sales Pipeline",
-    value: "$2.4M",
-    change: "+15%",
-    trend: "up",
-    icon: TrendingUp,
-    description: "Total pipeline value",
-  },
-  {
-    title: "Compliance Score",
-    value: "94%",
-    change: "-2%",
-    trend: "down",
-    icon: Shield,
-    description: "Overall compliance rating",
-  },
-]
+
 
 const recentActivities = [
   {
     id: 1,
     type: "visit",
-    title: "Visit completed at City General Hospital",
-    description: "Met with Dr. Sarah Johnson - Cardiology",
+    title: "Visit completed at Ibn Sina Hospital",
+    description: "Met with Dr. Ahmad Hassan - General Medicine",
     time: "2 hours ago",
     status: "completed",
   },
@@ -75,7 +99,7 @@ const recentActivities = [
     id: 2,
     type: "sample",
     title: "Sample distribution logged",
-    description: "Delivered 5 units of CardioStent Pro",
+    description: "Delivered 8 units at Al-Kindi Hospital",
     time: "4 hours ago",
     status: "completed",
   },
@@ -83,15 +107,15 @@ const recentActivities = [
     id: 3,
     type: "tender",
     title: "New tender opportunity",
-    description: "Regional Hospital Network - $500K",
+    description: "Baghdad Medical City - $750K",
     time: "6 hours ago",
     status: "pending",
   },
   {
     id: 4,
     type: "compliance",
-    title: "Compliance alert",
-    description: "Sample expiry reminder for Batch #A2024",
+    title: "Compliance update",
+    description: "Documentation review completed",
     time: "1 day ago",
     status: "alert",
   },
@@ -282,265 +306,591 @@ const getComplianceTrendOption = () => applyChartTheme({
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview")
+  
+  const analytics = useMemo(() => calculateDashboardAnalytics(), [])
 
   return (
     <MainLayout 
-      headerTitle="Dashboard"
-      headerSubtitle="Welcome back, Mahyar"
+      headerTitle="Dashboard Overview" 
+      headerSubtitle="Real-time insights and performance metrics"
     >
       <div className="p-2 md:p-4 lg:p-6">
         <NoSSR>
-          <Tabs key={activeTab} value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="activity">Activity</TabsTrigger>
-                  <TabsTrigger value="insights">Insights</TabsTrigger>
-                </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <TabsTrigger value="overview" className="text-xs sm:text-sm">
+                <ChartBar className="h-4 w-4 mr-2" />
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="activity" className="text-xs sm:text-sm">
+                <Activity className="h-4 w-4 mr-2" />
+                Activity
+              </TabsTrigger>
+              <TabsTrigger value="insights" className="text-xs sm:text-sm">
+                <Target className="h-4 w-4 mr-2" />
+                Insights
+              </TabsTrigger>
+              <TabsTrigger value="performance" className="text-xs sm:text-sm">
+                <Award className="h-4 w-4 mr-2" />
+                Performance
+              </TabsTrigger>
+            </TabsList>
 
-                <TabsContent value="overview" className="space-y-6">
-                  {/* KPI Cards */}
-                  <KPIGrid
-                    metrics={kpiData.map((kpi, index) => ({
-                      title: kpi.title,
-                      value: kpi.value,
-                      change: kpi.change,
-                      trend: kpi.trend,
-                      period: "from last month",
-                      icon: kpi.icon,
-                      description: kpi.description,
-                      variant: index === 0 ? "gradient" : index === 2 ? "purple" : "default",
-                    }))}
-                  />
+            <TabsContent value="overview" className="space-y-6">
+              {/* Enhanced KPI Grid with Real Data */}
+              <KPIGrid
+                metrics={[
+                  {
+                    title: "Total HCPs",
+                    value: analytics.totalHCPs.toString(),
+                    change: "+5.2%",
+                    trend: "up",
+                    period: "from last month",
+                    icon: Users,
+                    variant: "featured",
+                  },
+                  {
+                    title: "Completed Visits",
+                    value: analytics.completedVisits.toString(),
+                    change: "+12.3%",
+                    trend: "up",
+                    period: "this month",
+                    icon: MapPin,
+                    variant: "default",
+                  },
+                  {
+                    title: "Pipeline Value",
+                    value: `$${(analytics.estimatedPipeline / 1000000).toFixed(1)}M`,
+                    change: "+18.5%",
+                    trend: "up",
+                    period: "estimated",
+                    icon: DollarSign,
+                    variant: "success",
+                  },
+                  {
+                    title: "Avg Engagement",
+                    value: `${analytics.avgEngagementScore}%`,
+                    change: "+3.1%",
+                    trend: "up",
+                    period: "overall score",
+                    icon: Target,
+                    variant: "purple",
+                  },
+                ]}
+              />
 
-                  {/* Enhanced Analytics Charts - Row 1 */}
-                  <div className="grid gap-6 lg:grid-cols-2">
-                    <Card className="card-minimal">
-                      <CardHeader>
-                        <CardTitle>Sales Performance Trends</CardTitle>
-                        <CardDescription>Monthly revenue and field visit correlation</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <ReactECharts option={getSalesTrendOption()} style={{ height: "300px" }} />
-                      </CardContent>
-                    </Card>
+              {/* Secondary Metrics Row */}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card className="card-minimal">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Compliance Rate</CardTitle>
+                    <Shield className="h-4 w-4 text-green-600" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-green-600">{analytics.complianceRate}%</div>
+                    <p className="text-xs text-muted-foreground">+2% from last month</p>
+                  </CardContent>
+                </Card>
 
-                    <Card className="card-minimal">
-                      <CardHeader>
-                        <CardTitle>HCP Engagement Analysis</CardTitle>
-                        <CardDescription>Engagement rates by medical specialty</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <ReactECharts option={getHCPEngagementOption()} style={{ height: "300px" }} />
-                      </CardContent>
-                    </Card>
+                <Card className="card-minimal">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-blue-600" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-blue-600">{analytics.conversionRate}%</div>
+                    <p className="text-xs text-muted-foreground">High engagement HCPs</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="card-minimal">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Samples Distributed</CardTitle>
+                    <Package className="h-4 w-4 text-purple-600" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-purple-600">{analytics.totalSamples}</div>
+                    <p className="text-xs text-muted-foreground">Total units this month</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="card-minimal">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Coverage Areas</CardTitle>
+                    <Building className="h-4 w-4 text-orange-600" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-orange-600">{analytics.regions}</div>
+                    <p className="text-xs text-muted-foreground">Active regions</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Enhanced Analytics Charts - Row 1 */}
+              <div className="grid gap-6 lg:grid-cols-2">
+                <Card className="card-minimal">
+                  <CardHeader>
+                    <CardTitle>Sales Performance Trends</CardTitle>
+                    <CardDescription>Monthly sales growth and target achievement</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ReactECharts option={getSalesTrendOption()} style={{ height: "100%" }} className="h-[250px] sm:h-[300px] lg:h-[350px] min-h-[200px]" />
+                  </CardContent>
+                </Card>
+
+                <Card className="card-minimal">
+                  <CardHeader>
+                    <CardTitle>HCP Engagement Distribution</CardTitle>
+                    <CardDescription>Engagement scores across healthcare providers</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ReactECharts option={getHCPEngagementOption()} style={{ height: "100%" }} className="h-[250px] sm:h-[300px] lg:h-[350px] min-h-[200px]" />
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Enhanced Analytics Charts - Row 2 */}
+              <div className="grid gap-6 lg:grid-cols-2">
+                <Card className="card-minimal">
+                  <CardHeader>
+                    <CardTitle>Sample Distribution Overview</CardTitle>
+                    <CardDescription>Quarterly sample distribution and inventory status</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ReactECharts option={getSampleDistributionOption()} style={{ height: "100%" }} className="h-[250px] sm:h-[300px] lg:h-[350px] min-h-[200px]" />
+                  </CardContent>
+                </Card>
+
+                <Card className="card-minimal">
+                  <CardHeader>
+                    <CardTitle>Compliance Score Progression</CardTitle>
+                    <CardDescription>Monthly compliance score trends with area fill</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ReactECharts option={getComplianceTrendOption()} style={{ height: "100%" }} className="h-[250px] sm:h-[300px] lg:h-[350px] min-h-[200px]" />
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Territory Performance and Enhanced Actions */}
+              <div className="grid gap-6 lg:grid-cols-3">
+                <Card className="lg:col-span-2 card-minimal">
+                  <CardHeader>
+                    <CardTitle>Territory Performance Overview</CardTitle>
+                    <CardDescription>Coverage and performance metrics by region</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ReactECharts option={getTerritoryPerformanceOption()} style={{ height: "100%" }} className="h-[250px] sm:h-[300px] lg:h-[350px] min-h-[200px]" />
+                  </CardContent>
+                </Card>
+
+                <Card className="card-glass">
+                  <CardHeader>
+                    <CardTitle className="text-gradient">Quick Actions</CardTitle>
+                    <CardDescription>Common tasks and shortcuts</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Button className="w-full justify-start bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white hover:text-white border-none shadow-lg hover:shadow-xl transition-all duration-200 font-medium">
+                      <Users className="h-4 w-4 mr-2" />
+                      Add New HCP
+                    </Button>
+                    <Button className="w-full justify-start bg-white hover:bg-gray-100 text-gray-800 hover:text-gray-900 border border-gray-200 hover:border-gray-400 shadow-sm hover:shadow-md transition-all duration-200 font-medium">
+                      <MapPin className="h-4 w-4 mr-2" />
+                      Plan Route
+                    </Button>
+                    <Button className="w-full justify-start bg-white hover:bg-gray-100 text-gray-800 hover:text-gray-900 border border-gray-200 hover:border-gray-400 shadow-sm hover:shadow-md transition-all duration-200 font-medium">
+                      <Package className="h-4 w-4 mr-2" />
+                      Log Sample
+                    </Button>
+                    <Button className="w-full justify-start bg-white hover:bg-gray-100 text-gray-800 hover:text-gray-900 border border-gray-200 hover:border-gray-400 shadow-sm hover:shadow-md transition-all duration-200 font-medium">
+                      <FileText className="h-4 w-4 mr-2" />
+                      Create Report
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Enhanced Metrics Row with Real Data */}
+              <KPIGrid
+                metrics={[
+                  {
+                    title: "Public Facilities",
+                    value: analytics.publicFacilities.toString(),
+                    change: "+3",
+                    trend: "up",
+                    period: "new partnerships",
+                    icon: Building,
+                    variant: "default",
+                  },
+                  {
+                    title: "Private Facilities",
+                    value: analytics.privateFacilities.toString(),
+                    change: "+2",
+                    trend: "up",
+                    period: "new contracts",
+                    icon: Stethoscope,
+                    variant: "default",
+                  },
+                  {
+                    title: "Pending Visits",
+                    value: analytics.pendingVisits.toString(),
+                    change: "-5",
+                    trend: "down",
+                    period: "scheduled",
+                    icon: Clock,
+                    variant: "warning",
+                  },
+                  {
+                    title: "High Engagement",
+                    value: analytics.highEngagement.toString(),
+                    change: "+7",
+                    trend: "up",
+                    period: "HCPs (80%+ score)",
+                    icon: Award,
+                    variant: "success",
+                  },
+                ]}
+              />
+            </TabsContent>
+
+            <TabsContent value="activity" className="space-y-6">
+              <Card className="card-featured">
+                <CardHeader>
+                  <CardTitle className="text-white">Recent Activity</CardTitle>
+                  <CardDescription className="text-white/80">Your latest actions and system updates</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {recentActivities.map((activity, index) => (
+                      <motion.div
+                        key={activity.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex items-start gap-4 p-4 bg-white/10 rounded-lg backdrop-blur-sm"
+                      >
+                        <div className="shrink-0">
+                          {activity.type === "visit" && <MapPin className="h-5 w-5 text-green-400" />}
+                          {activity.type === "sample" && <Package className="h-5 w-5 text-blue-400" />}
+                          {activity.type === "tender" && <TrendingUp className="h-5 w-5 text-purple-400" />}
+                          {activity.type === "compliance" && <Shield className="h-5 w-5 text-orange-400" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-white">{activity.title}</h4>
+                          <p className="text-sm text-white/70">{activity.description}</p>
+                          <p className="text-xs text-white/50 mt-1">{activity.time}</p>
+                        </div>
+                        <div className="shrink-0">
+                          {activity.status === "completed" && (
+                            <div className="h-2 w-2 bg-green-400 rounded-full"></div>
+                          )}
+                          {activity.status === "pending" && (
+                            <div className="h-2 w-2 bg-yellow-400 rounded-full"></div>
+                          )}
+                          {activity.status === "alert" && (
+                            <div className="h-2 w-2 bg-red-400 rounded-full animate-pulse"></div>
+                          )}
+                        </div>
+                      </motion.div>
+                    ))}
                   </div>
+                </CardContent>
+              </Card>
 
-                  {/* Enhanced Analytics Charts - Row 2 */}
-                  <div className="grid gap-6 lg:grid-cols-2">
-                    <Card className="card-minimal">
-                      <CardHeader>
-                        <CardTitle>Sample Distribution Overview</CardTitle>
-                        <CardDescription>Quarterly sample distribution and inventory status</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <ReactECharts option={getSampleDistributionOption()} style={{ height: "300px" }} />
-                      </CardContent>
-                    </Card>
-
-                    <Card className="card-minimal">
-                      <CardHeader>
-                        <CardTitle>Compliance Score Progression</CardTitle>
-                        <CardDescription>Monthly compliance score trends with area fill</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <ReactECharts option={getComplianceTrendOption()} style={{ height: "300px" }} />
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Territory Performance and Quick Actions */}
-                  <div className="grid gap-6 lg:grid-cols-3">
-                    <Card className="lg:col-span-2 card-minimal">
-                      <CardHeader>
-                        <CardTitle>Territory Performance Overview</CardTitle>
-                        <CardDescription>Coverage and performance metrics by region</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <ReactECharts option={getTerritoryPerformanceOption()} style={{ height: "300px" }} />
-                      </CardContent>
-                    </Card>
-
-                    <Card className="card-glass">
-                      <CardHeader>
-                        <CardTitle className="text-gradient">Quick Actions</CardTitle>
-                        <CardDescription>Common tasks and shortcuts</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <Button className="w-full justify-start btn-gradient hover:btn-gradient">
-                          <Users className="h-4 w-4 mr-2" />
-                          Add New HCP
-                        </Button>
-                        <Button className="w-full justify-start btn-minimal">
-                          <MapPin className="h-4 w-4 mr-2" />
-                          Plan Route
-                        </Button>
-                        <Button className="w-full justify-start btn-minimal">
-                          <Package className="h-4 w-4 mr-2" />
-                          Log Sample
-                        </Button>
-                        <Button className="w-full justify-start btn-minimal">
-                          <FileText className="h-4 w-4 mr-2" />
-                          Create Report
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Additional Metrics Row */}
-                  <KPIGrid
-                    metrics={[
-                      {
-                        title: "Conversion Rate",
-                        value: "24.3%",
-                        change: "+2.1%",
-                        trend: "up",
-                        period: "from last month",
-                        icon: TrendingUp,
-                        variant: "featured",
-                      },
-                      {
-                        title: "Avg. Deal Size",
-                        value: "$45K",
-                        change: "+8.5%",
-                        trend: "up",
-                        period: "from last month",
-                        icon: DollarSign,
-                        variant: "default",
-                      },
-                      {
-                        title: "Sales Cycle",
-                        value: "45 days",
-                        change: "-3 days",
-                        trend: "down" as const,
-                        period: "from last month",
-                        icon: Calendar,
-                        variant: "default",
-                      },
-                      {
-                        title: "Customer Satisfaction",
-                        value: "4.8/5",
-                        change: "+0.2",
-                        trend: "up",
-                        period: "from last month",
-                        icon: Award,
-                        variant: "purple",
-                      },
-                    ]}
-                  />
-                </TabsContent>
-
-                <TabsContent value="activity" className="space-y-6">
-                  <Card className="card-featured">
-                    <CardHeader>
-                      <CardTitle className="text-white">Recent Activity</CardTitle>
-                      <CardDescription className="text-white/80">Your latest actions and system updates</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {recentActivities.map((activity, index) => (
-                          <motion.div
-                            key={activity.id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className="flex items-start gap-4 p-3 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30"
-                          >
-                            <div
-                              className={`h-2 w-2 rounded-full mt-2 ${
-                                activity.status === "completed"
-                                  ? "bg-green-400"
-                                  : activity.status === "pending"
-                                    ? "bg-yellow-400"
-                                    : "bg-red-400"
-                              }`}
-                            />
-                            <div className="flex-1 space-y-1">
-                              <p className="text-sm font-medium text-white">{activity.title}</p>
-                              <p className="text-xs text-white/70">{activity.description}</p>
-                              <p className="text-xs text-white/60">{activity.time}</p>
-                            </div>
-                          </motion.div>
-                        ))}
+              {/* Activity Analytics */}
+              <div className="grid gap-6 md:grid-cols-2">
+                <Card className="card-minimal">
+                  <CardHeader>
+                    <CardTitle>Activity Timeline</CardTitle>
+                    <CardDescription>Daily activity patterns and trends</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Visits Completed</span>
+                        <span className="text-sm font-medium">24 today</span>
                       </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Samples Distributed</span>
+                        <span className="text-sm font-medium">156 units</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Reports Generated</span>
+                        <span className="text-sm font-medium">8 reports</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Compliance Checks</span>
+                        <span className="text-sm font-medium">12 completed</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-                <TabsContent value="insights" className="space-y-6">
-                  <div className="grid gap-6 lg:grid-cols-2">
-                    <Card className="card-important">
-                      <CardHeader>
-                        <CardTitle className="text-white">Performance Insights</CardTitle>
-                        <CardDescription className="text-white/80">Key metrics and trends analysis</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="flex items-center gap-2 p-3 bg-white/20 backdrop-blur-sm rounded-lg border border-white/30">
-                            <TrendingUp className="h-4 w-4 text-green-300" />
-                            <div>
-                              <p className="text-sm font-medium text-white">Visit efficiency up 15%</p>
-                              <p className="text-xs text-white/70">Compared to last quarter</p>
-                            </div>
-                          </div>
+                <Card className="card-minimal">
+                  <CardHeader>
+                    <CardTitle>Territory Insights</CardTitle>
+                    <CardDescription>Regional performance breakdown</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Baghdad Region</span>
+                        <span className="text-sm font-medium text-green-600">High Activity</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Basra Region</span>
+                        <span className="text-sm font-medium text-blue-600">Moderate</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Erbil Region</span>
+                        <span className="text-sm font-medium text-purple-600">Growing</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Mosul Region</span>
+                        <span className="text-sm font-medium text-orange-600">Potential</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
 
-                          <div className="flex items-center gap-2 p-3 bg-white/20 backdrop-blur-sm rounded-lg border border-white/30">
-                            <Users className="h-4 w-4 text-blue-300" />
-                            <div>
-                              <p className="text-sm font-medium text-white">New HCP relationships: 23</p>
-                              <p className="text-xs text-white/70">This month</p>
-                            </div>
-                          </div>
+            <TabsContent value="insights" className="space-y-6">
+              {/* Key Insights */}
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <Card className="card-highlight">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Target className="h-5 w-5" />
+                      Top Opportunity
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-white">
+                    <p className="text-lg font-semibold">Baghdad Medical City</p>
+                    <p className="text-sm text-white/80">High-potential facility with 850+ beds</p>
+                    <p className="text-xs text-white/70 mt-2">Estimated value: $2.3M</p>
+                  </CardContent>
+                </Card>
 
-                          <div className="flex items-center gap-2 p-3 bg-white/20 backdrop-blur-sm rounded-lg border border-white/30">
-                            <AlertCircle className="h-4 w-4 text-yellow-300" />
-                            <div>
-                              <p className="text-sm font-medium text-white">3 compliance items need attention</p>
-                              <p className="text-xs text-white/70">Review required</p>
-                            </div>
-                          </div>
+                <Card className="card-important">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5" />
+                      Growth Leader
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-white">
+                    <p className="text-lg font-semibold">Cardiology Segment</p>
+                    <p className="text-sm text-white/80">+45% growth this quarter</p>
+                    <p className="text-xs text-white/70 mt-2">12 new HCP partnerships</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="card-minimal border-amber-200 bg-amber-50">
+                  <CardHeader>
+                    <CardTitle className="text-amber-800 flex items-center gap-2">
+                      <AlertCircle className="h-5 w-5" />
+                      Action Required
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-lg font-semibold text-amber-800">Sample Inventory</p>
+                    <p className="text-sm text-amber-700">Low stock alert - 3 products</p>
+                    <p className="text-xs text-amber-600 mt-2">Reorder by next week</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Detailed Analytics */}
+              <div className="grid gap-6 md:grid-cols-2">
+                <Card className="card-minimal">
+                  <CardHeader>
+                    <CardTitle>Market Penetration</CardTitle>
+                    <CardDescription>Coverage analysis by facility type</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>Public Hospitals</span>
+                          <span>78%</span>
                         </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="card-glass">
-                      <CardHeader>
-                        <CardTitle className="text-gradient">Recommendations</CardTitle>
-                        <CardDescription>AI-powered suggestions for optimization</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          <div className="p-3 border border-violet-200/50 rounded-lg bg-gradient-subtle">
-                            <p className="text-sm font-medium">Focus on Cardiology</p>
-                            <p className="text-xs text-muted-foreground">High engagement rates in this specialty</p>
-                          </div>
-
-                          <div className="p-3 border border-violet-200/50 rounded-lg bg-gradient-subtle">
-                            <p className="text-sm font-medium">Schedule follow-ups</p>
-                            <p className="text-xs text-muted-foreground">5 HCPs haven&apos;t been visited in 30+ days</p>
-                          </div>
-
-                          <div className="p-3 border border-violet-200/50 rounded-lg bg-gradient-subtle">
-                            <p className="text-sm font-medium">Sample optimization</p>
-                            <p className="text-xs text-muted-foreground">Reduce waste by 12% with better planning</p>
-                          </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-blue-600 h-2 rounded-full" style={{ width: "78%" }}></div>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>Private Clinics</span>
+                          <span>65%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-purple-600 h-2 rounded-full" style={{ width: "65%" }}></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>Specialized Centers</span>
+                          <span>82%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-green-600 h-2 rounded-full" style={{ width: "82%" }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="card-minimal">
+                  <CardHeader>
+                    <CardTitle>Performance Trends</CardTitle>
+                    <CardDescription>Key metrics over time</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <div>
+                          <p className="text-sm font-medium text-green-800">Visit Completion Rate</p>
+                          <p className="text-xs text-green-600">+8% this month</p>
+                        </div>
+                        <div className="text-2xl font-bold text-green-600">94%</div>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <div>
+                          <p className="text-sm font-medium text-blue-800">Average Deal Size</p>
+                          <p className="text-xs text-blue-600">+12% this quarter</p>
+                        </div>
+                        <div className="text-2xl font-bold text-blue-600">$48K</div>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                        <div>
+                          <p className="text-sm font-medium text-purple-800">Customer Satisfaction</p>
+                          <p className="text-xs text-purple-600">+0.3 this month</p>
+                        </div>
+                        <div className="text-2xl font-bold text-purple-600">4.7/5</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="performance" className="space-y-6">
+              {/* Performance Overview */}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card className="card-minimal">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Monthly Target</CardTitle>
+                    <Target className="h-4 w-4 text-blue-600" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-blue-600">85%</div>
+                    <p className="text-xs text-muted-foreground">Achievement rate</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="card-minimal">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Revenue Growth</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-green-600" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-green-600">+24%</div>
+                    <p className="text-xs text-muted-foreground">Year over year</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="card-minimal">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Market Share</CardTitle>
+                    <ChartBar className="h-4 w-4 text-purple-600" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-purple-600">31%</div>
+                    <p className="text-xs text-muted-foreground">In target regions</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="card-minimal">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Team Efficiency</CardTitle>
+                    <Award className="h-4 w-4 text-orange-600" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-orange-600">92%</div>
+                    <p className="text-xs text-muted-foreground">Productivity score</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Performance Details */}
+              <Card className="card-minimal">
+                <CardHeader>
+                  <CardTitle>Quarterly Performance Review</CardTitle>
+                  <CardDescription>Detailed breakdown of key performance indicators</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="space-y-4">
+                      <h4 className="font-medium">Sales Performance</h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Q4 Target</span>
+                          <span className="text-sm font-medium">$3.2M</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Q4 Achieved</span>
+                          <span className="text-sm font-medium text-green-600">$2.8M</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Pipeline</span>
+                          <span className="text-sm font-medium">$4.1M</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="font-medium">Territory Coverage</h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Active Territories</span>
+                          <span className="text-sm font-medium">{analytics.regions}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Coverage Rate</span>
+                          <span className="text-sm font-medium text-blue-600">87%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">New Opportunities</span>
+                          <span className="text-sm font-medium">23</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="font-medium">Quality Metrics</h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Compliance Score</span>
+                          <span className="text-sm font-medium text-green-600">{analytics.complianceRate}%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Customer Satisfaction</span>
+                          <span className="text-sm font-medium">4.7/5</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Response Time</span>
+                          <span className="text-sm font-medium">&lt; 2 hours</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </TabsContent>
-              </Tabs>
-            </NoSSR>
-          </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </NoSSR>
+      </div>
     </MainLayout>
   )
 }

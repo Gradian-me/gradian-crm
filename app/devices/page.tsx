@@ -18,8 +18,6 @@ import {
   TrendingUp, 
   AlertTriangle,
   Plus,
-  Download,
-  Upload,
   Users
 } from "lucide-react"
 
@@ -54,30 +52,12 @@ export default function DevicesPage() {
     // Handle adding new device
   }
 
-  const handleImportDevices = () => {
-    console.log('Import devices')
-    // Handle device import
-  }
-
-  const handleExportDevices = () => {
-    console.log('Export devices')
-    // Handle device export
-  }
-
   return (
     <MainLayout
       headerTitle="Medical Devices Management"
       headerSubtitle="Comprehensive medical equipment catalog and inventory management"
       customHeaderActions={
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleImportDevices}>
-            <Upload className="h-4 w-4 mr-2" />
-            Import
-          </Button>
-          <Button variant="outline" onClick={handleExportDevices}>
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
           <Button onClick={handleAddDevice}>
             <Plus className="h-4 w-4 mr-2" />
             Add Device

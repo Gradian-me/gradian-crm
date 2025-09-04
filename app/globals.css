@@ -249,12 +249,14 @@
     border: 1px solid oklch(0.9 0 0);
     color: oklch(0.4 0 0);
     transition: all 0.2s ease;
+    font-weight: 500;
   }
   
   .btn-minimal:hover {
     background: var(--gradient-subtle);
     border-color: oklch(0.65 0.15 280 / 0.5);
-    color: oklch(0.25 0 0);
+    color: oklch(0.15 0 0) !important;
+    font-weight: 600;
   }
   
   .btn-gradient {
@@ -262,12 +264,14 @@
     border: none;
     color: white;
     transition: all 0.3s ease;
+    font-weight: 500;
   }
   
   .btn-gradient:hover {
     background: var(--gradient-mixed);
     transform: translateY(-1px);
     box-shadow: 0 6px 20px oklch(0.6 0.2 280 / 0.25);
+    color: white !important;
   }
   
   /* Text gradients */
@@ -299,5 +303,35 @@
   
   .shadow-purple {
     box-shadow: 0 10px 30px oklch(0.55 0.18 270 / 0.2);
+  }
+
+  /* Enhanced button hover readability fixes */
+  /* Improved button text contrast for better accessibility */
+  
+  /* Ensure white text on gradient buttons stays readable */
+  .bg-gradient-to-r[class*="blue"]:hover {
+    color: white !important;
+  }
+  
+  /* Improved contrast for light buttons */
+  .bg-white:hover {
+    background-color: rgb(249 250 251) !important; /* gray-50 */
+  }
+  
+  /* Enhanced outline button hover */
+  [data-slot="button"][class*="outline"]:hover {
+    color: oklch(0.2 0 0) !important;
+  }
+  
+  /* Better ghost button contrast */
+  [data-slot="button"][class*="ghost"]:hover {
+    color: oklch(0.2 0 0) !important;
+  }
+}
+
+/* Responsive funnel widths */
+@media (min-width: 1024px) {
+  [class*="funnel-stage-"] {
+    width: var(--desktop-width) !important;
   }
 }
