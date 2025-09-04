@@ -1,51 +1,49 @@
 "use client"
 
-import React, { useState } from "react"
-import { motion } from "framer-motion"
-import {
-  TrendingUp,
-  CheckCircle,
-  AlertTriangle,
-  Clock,
-  XCircle,
-  FileText,
-  Activity,
-  Target,
-  ChevronRight,
-  ChevronDown,
-  Beaker,
-  Microscope,
-  Shield,
-  Zap,
-  Settings,
-  User,
-  Calendar,
-  AlertCircle,
-  BarChart3,
-  Filter,
-  Search,
-  Download,
-  Eye,
-  Edit
-} from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MainLayout } from "@/components/layout/MainLayout"
-import { NoSSR } from "@/components/ui/no-ssr"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  DialogTitle
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { NoSSR } from "@/components/ui/no-ssr"
+import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { projectATestResults, testsByEffect, TestResult, TestCategory } from "@/lib/test-results"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { projectATestResults, TestCategory, TestResult } from "@/lib/test-results"
+import { motion } from "framer-motion"
+import {
+  Activity,
+  AlertCircle,
+  AlertTriangle,
+  BarChart3,
+  Beaker,
+  Calendar,
+  CheckCircle,
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  Download,
+  Edit,
+  Eye,
+  Filter,
+  Microscope,
+  Search,
+  Settings,
+  Shield,
+  Target,
+  TrendingUp,
+  User,
+  XCircle,
+  Zap
+} from "lucide-react"
+import React, { useState } from "react"
 
 // Category icons mapping
 const categoryIcons = {

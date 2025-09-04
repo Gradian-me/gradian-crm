@@ -1,28 +1,20 @@
 "use client"
 
-import { useState } from "react"
-import {
-  ChartBar,
-  Activity,
-  Target,
-  Award,
-  Users,
-  MapPin,
-  TrendingUp,
-  AlertCircle,
-  Calendar,
-  Package,
-  Shield,
-  DollarSign,
-  Clock,
-} from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { ScrollableTabs } from "@/components/ui/scrollable-tabs"
 import { MainLayout } from "@/components/layout/MainLayout"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ScrollableTabs } from "@/components/ui/scrollable-tabs"
+import {
+  Activity,
+  Clock,
+  DollarSign,
+  Shield,
+  Target,
+  TrendingUp,
+  Users
+} from "lucide-react"
 
 export default function ScrollableTabsDemo() {
-  const [activeTab, setActiveTab] = useState("overview")
 
   const tabs = [
     {
@@ -379,7 +371,6 @@ export default function ScrollableTabsDemo() {
         <ScrollableTabs
           tabs={tabs}
           defaultValue="overview"
-          onValueChange={setActiveTab}
           className="space-y-6"
         />
       </div>
