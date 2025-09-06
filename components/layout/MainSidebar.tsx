@@ -15,6 +15,7 @@ import {
   UserCheck,
   TabletSmartphone,
   Beaker,
+  Sparkles,
 } from "lucide-react"
 import {
   SidebarContent,
@@ -27,18 +28,19 @@ import {
 
 const sidebarItems = [
   { icon: BarChart3, label: "Dashboard", href: "/" },
+  { icon: Sparkles, label: "Introduction", href: "/introduction" },
   { icon: Users, label: "HCP Management", href: "/hcp" },
   { icon: UserCheck, label: "Med Reps", href: "/med-reps" },
   { icon: MapPin, label: "Field Tracking", href: "/field" },
   { icon: TrendingUp, label: "Sales Funnel", href: "/sales" },
   { icon: FileText, label: "Contracts", href: "/contracts" },
-  { icon: Beaker, label: "Project Justification", href: "/project-justification" },
   { icon: Stethoscope, label: "Medical Devices", href: "/devices" },
   { icon: Warehouse, label: "Inventory Management", href: "/inventory" },
   { icon: Package, label: "Samples", href: "/samples" },
   { icon: Shield, label: "Compliance", href: "/compliance" },
   { icon: Activity, label: "Analytics", href: "/analytics" },
   { icon: TabletSmartphone, label: "Scrollable Tabs Demo", href: "/scrollable-tabs-demo" },
+  { icon: Beaker, label: "Project Justification", href: "/project-justification" },
 ]
 
 export function MainSidebar() {
