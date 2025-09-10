@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2025-09-10 18:46:15] - Bug Fix: Enhanced Markdown Page Design with Montserrat Font
+Date and Time of changes: 2025-09-10 18:46:15
+Detailed description of changes: Enhanced markdown page styling with Montserrat font, modern card-based layout, gradient backgrounds, custom component styling, and integrated main layout with sidebar navigation. Added responsive design with shadow effects and improved typography.
+Components affected:
+- app/markdown/[doc-name]/page.tsx (added Montserrat font, MainLayout integration, modern styling, custom ReactMarkdown components)
+- package.json (added @next/font dependency)
+----
+
+## [2025-09-10 18:43:15] - Feature Minor: Dynamic Markdown Route System
+Date and Time of changes: 2025-09-10 18:43:15
+Detailed description of changes: Created dynamic route system /markdown/[doc-name] that renders markdown files from app/docs directory as formatted webpages. Added react-markdown dependency for markdown parsing and implemented static generation for all available markdown files.
+Components affected:
+- app/markdown/[doc-name]/page.tsx (new dynamic route component)
+- package.json (added react-markdown dependency)
+----
+
+## [2025-09-10 18:42:57] - Feature Minor: VC Features Overview Documentation
+Date and Time of changes: 2025-09-10 18:42:57
+Detailed description of changes: Created comprehensive marketable feature descriptions for all platform pages to support investor presentations and business development activities. Each section includes inspiring descriptions, key features, and quantifiable business outcomes designed for VC presentations and stakeholder communications.
+Components affected:
+- app/docs/vc-features-overview.md (new file with complete feature overview)
+----
+
 ## [2025-09-04 15:03:05] - Bug Fix: Project Justification Menu Item Already Present
 Date and Time of changes: 2025-09-04 15:03:05
 Detailed description of changes: Confirmed that the Project Justification page is already properly added to the main navigation menu in the sidebar. The menu item is configured with a Beaker icon, labeled "Project Justification", and linked to "/project-justification" route. No changes were needed as the menu integration was already complete and functional.
@@ -504,4 +527,11 @@ Components affected:
 - app/introduction/page.tsx (new file - comprehensive modern marketing page with 8 sections, hero, stats, features, use cases, benefits, technology, and CTA)
 - app/introduction/loading.tsx (new file - skeleton loading component matching page structure)
 - components/layout/MainSidebar.tsx (added introduction page navigation with Sparkles icon)
+----
+
+## [2025-09-10 18:27:51] - Feature Minor: Add Gradian Logo to Header for Desktop View
+Date and Time of changes: 2025-09-10 18:27:51
+Detailed description of changes: Added the Gradian logo to the MainHeader component, positioned before the title and visible only on desktop screens (hidden on mobile using responsive classes). The logo uses the Gradian-Logo-lightmode-min.png file from the public/media directory and is sized appropriately for the header with responsive design considerations. Added Next.js Image component import and configured the logo with proper width, height, alt text, and priority loading for optimal performance.
+Components affected:
+- components/layout/MainHeader.tsx (added Image import, inserted logo before title with responsive visibility classes)
 ---- 

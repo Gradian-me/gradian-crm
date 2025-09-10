@@ -35,7 +35,7 @@ export function MainLayout({
             showScheduleButton={showScheduleButton}
             customActions={customHeaderActions}
           />
-          <main className="flex-1 overflow-auto p-2 lg:p-4">
+          <main className="flex-1 overflow-auto p-2 lg:p-4 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
             {children}
           </main>
         </SidebarInset>
