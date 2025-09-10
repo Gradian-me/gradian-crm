@@ -21,7 +21,7 @@ async function getMarkdownContent(docName: string) {
     const filePath = path.join(process.cwd(), 'app', 'docs', `${docName}.md`)
     const content = await fs.readFile(filePath, 'utf8')
     return content
-  } catch (error) {
+  } catch {
     return null
   }
 }
@@ -73,7 +73,7 @@ export async function generateStaticParams() {
     return markdownFiles.map((file) => ({
       'doc-name': file.replace('.md', '')
     }))
-  } catch (error) {
+  } catch {
     return []
   }
 } 
