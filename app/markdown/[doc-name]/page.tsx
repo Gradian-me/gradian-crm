@@ -11,9 +11,9 @@ const montserrat = Montserrat({
 })
 
 interface PageProps {
-  params: {
+  params: Promise<{
     'doc-name': string
-  }
+  }>
 }
 
 async function getMarkdownContent(docName: string) {
