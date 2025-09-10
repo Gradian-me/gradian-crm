@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
@@ -39,6 +40,14 @@ export function MainHeader({
     }`}>
       <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 min-w-0 flex-1 w-full sm:w-auto">
         <SidebarTrigger />
+        <Image 
+          src="/media/Gradian-Logo-lightmode-min.png" 
+          alt="Gradian Logo" 
+          width={120} 
+          height={40}
+          className="hidden md:block flex-shrink-0 h-8 w-auto"
+          priority
+        />
         <div className="min-w-0 flex-1">
           <h1 className="text-sm xs:text-base sm:text-lg lg:text-xl xl:text-2xl font-bold text-balance break-words leading-tight pr-2 text-gradient">{title}</h1>
           {subtitle && (
@@ -46,7 +55,9 @@ export function MainHeader({
           )}
         </div>
       </div>
+      
       <div className="flex items-center gap-1 sm:gap-2 mt-2 sm:mt-0 flex-shrink-0 w-full sm:w-auto justify-end sm:justify-start">
+        
         {showOnlineBadge && (
           <Badge variant="outline" className="gap-1 text-xs sm:text-sm whitespace-nowrap px-2 py-1 flex-shrink-0 min-w-fit border-green-300/50 bg-green-100/80 text-green-700 shadow-sm">
             <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-green-500 animate-pulse" />
@@ -65,6 +76,7 @@ export function MainHeader({
             {customActions}
           </div>
         )}
+        
       </div>
     </header>
   )
