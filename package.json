@@ -1,6 +1,6 @@
 {
   "name": "gradian-crm",
-  "version": "0.25.06",
+  "version": "0.30.04",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@next/font": "^14.2.15",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-progress": "^1.1.7",
@@ -33,6 +32,9 @@
     "react-dom": "^19.0.0",
     "react-leaflet": "^5.0.0",
     "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^15.6.6",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
@@ -42,6 +44,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
     "tailwindcss": "^4.1.12",
