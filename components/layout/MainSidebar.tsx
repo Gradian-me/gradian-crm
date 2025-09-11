@@ -16,6 +16,7 @@ import {
   TabletSmartphone,
   Beaker,
   Sparkles,
+  Presentation,
 } from "lucide-react"
 import {
   SidebarContent,
@@ -29,6 +30,7 @@ import {
 const sidebarItems = [
   { icon: BarChart3, label: "Dashboard", href: "/" },
   { icon: Sparkles, label: "Introduction", href: "/introduction" },
+  { icon: Presentation, label: "VC Features", href: "/markdown/vc-features-overview" },
   { icon: Users, label: "HCP Management", href: "/hcp" },
   { icon: UserCheck, label: "Med Reps", href: "/med-reps" },
   { icon: MapPin, label: "Field Tracking", href: "/field" },
@@ -68,7 +70,7 @@ export function MainSidebar() {
                   className="flex items-center gap-3 px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
                 >
                   <item.icon className="h-4 w-4" />
-                  {item.label}
+                  <span>{item.label}</span>
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>

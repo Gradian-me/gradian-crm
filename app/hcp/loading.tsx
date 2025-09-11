@@ -1,3 +1,5 @@
+import { LoadingLayout } from "@/components/layout/LoadingLayout";
+
 export default function Loading() {
-  return null
-}
+  return <LoadingLayout />;
+} 
