@@ -14,4 +14,4 @@ export {
   CompactGrid, 
   WideGrid, 
   TwoColumnGrid 
-} from "./MetricsGrid" 
+} from "./MetricsGrid"
